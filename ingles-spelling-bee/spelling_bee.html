@@ -1262,21 +1262,17 @@ function setupRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return null;
   const r = new SR();
-  // continuous=true: la sesion se queda activa entre letras, sin reinicios que metan retraso.
+  // Configuracion ORIGINAL conservadora: continuous=true, interimResults=false.
+  // Es la que daba mejor experiencia segun el usuario.
   r.continuous = true;
-  // interimResults=true: el motor envia hipotesis tempranas; procesamos solo las "finales"
-  // pero mantener la conexion "caliente" reduce latencia perceptiva.
-  r.interimResults = true;
+  r.interimResults = false;
   r.lang = 'en-US';
   // maxAlternatives=1: SOLO la mejor alternativa.
-  // Antes se escogia la "que mas letras tuviera", lo que duplicaba letras
-  // (ej: dices "B" -> motor sugeria "be be" -> escribia "BB").
+  // Antes era 3 con un algoritmo que escogia la "que mas letras tuviera",
+  // lo que causaba duplicacion (ej: dices "B" -> motor sugeria "be be" -> escribia "BB").
   r.maxAlternatives = 1;
   r.onresult = (e) => {
     for (let i = e.resultIndex; i < e.results.length; i++) {
-      // Solo procesamos cuando el motor da el resultado como "final"
-      // (los interim son hipotesis intermedias, no las queremos para no duplicar).
-      if (!e.results[i].isFinal) continue;
       const transcript = e.results[i][0].transcript;
       processDictation(transcript);
     }
