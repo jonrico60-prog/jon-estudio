@@ -1262,31 +1262,31 @@ function setupRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return null;
   const r = new SR();
-  r.continuous = true;
+  // continuous=false hace cada utterance mas rapida (menos retraso)
+  // El onend reinicia automaticamente para seguir escuchando
+  r.continuous = false;
   r.interimResults = false;
   r.lang = 'en-US';
-  r.maxAlternatives = 3;
+  // maxAlternatives=1: SOLO la mejor alternativa.
+  // Antes se escogia la "que mas letras tuviera", lo que duplicaba letras
+  // (ej: dices "B" -> motor sugeria "be be" -> escribia "BB").
+  r.maxAlternatives = 1;
+  // Anti-doble-procesado: cada resultado tiene un timestamp; si llega el mismo en menos de 200ms, se ignora.
+  let lastProcessedTs = 0;
   r.onresult = (e) => {
+    const now = Date.now();
+    if (now - lastProcessedTs < 200) return;
+    lastProcessedTs = now;
     for (let i = e.resultIndex; i < e.results.length; i++) {
-      let best = '';
-      let bestScore = -1;
-      const alts = e.results[i];
-      for (let j = 0; j < alts.length; j++) {
-        const t = alts[j].transcript;
-        const tokens = t.toLowerCase().replace(/[.,!?;:]/g, '').split(/\s+/);
-        let count = 0;
-        for (const tok of tokens) {
-          const norm = tok.replace(/[^a-záéíóúñ]/g, '');
-          if (LETTER_MAP[norm] !== undefined) count++;
-          else if (norm.length === 1 && /[a-z]/.test(norm)) count++;
-        }
-        if (count > bestScore) { bestScore = count; best = t; }
-      }
-      processDictation(best);
+      const transcript = e.results[i][0].transcript;
+      processDictation(transcript);
     }
   };
   r.onend = () => {
-    if (listening) { try { r.start(); } catch(e) {} }
+    // Reiniciar si seguimos en modo escucha (continuous=false termina tras cada utterance)
+    if (listening) {
+      try { r.start(); } catch(e) {}
+    }
   };
   r.onerror = (e) => {
     if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
