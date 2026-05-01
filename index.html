@@ -4,8 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jon - Portal de Estudio</title>
-<meta http-equiv="refresh" content="0; url=app/portal.html">
-<link rel="canonical" href="app/portal.html">
+<script>
+  // Redirige al login (o al portal si ya hay usuario logueado)
+  // Usamos replace() para no anadir entrada en el historial y evitar bucles
+  (function() {
+    var hayUsuario = localStorage.getItem('jon_current_user');
+    var destino = hayUsuario ? 'app/portal.html' : 'app/index.html';
+    window.location.replace(destino);
+  })();
+</script>
 <style>
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
@@ -24,7 +31,7 @@
 <body>
   <div>
     <h1>Cargando portal de Jon...</h1>
-    <p>Si no se redirige automáticamente, <a href="app/portal.html">pulsa aquí</a>.</p>
+    <p>Si no se redirige automáticamente, <a href="app/index.html">pulsa aquí para entrar</a>.</p>
   </div>
 </body>
 </html>
