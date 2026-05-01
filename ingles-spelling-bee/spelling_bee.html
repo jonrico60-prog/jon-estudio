@@ -2512,14 +2512,25 @@ if ('speechSynthesis' in window) {
 }
 setupEvents();
 
-// Modo auto-login: ?auto=Jon  (oculta selector de usuarios y boton "cambiar usuario")
+// Modo auto-login: ?auto=Jon  (entra directo desde el portal de Jon)
+// Sustituye el boton "Cambiar usuario" por "Volver al portal".
 (function() {
   var params = new URLSearchParams(window.location.search);
   var autoUser = params.get('auto');
   if (autoUser && USERS.some(function(u){ return u.name === autoUser; })) {
-    // Ocultar boton "Cambiar usuario" para que no se pueda salir al selector
+    // Cambiar el boton "Cambiar usuario" por "Volver al portal"
     var btnChange = document.getElementById('changeUserBtn');
-    if (btnChange) btnChange.style.display = 'none';
+    if (btnChange) {
+      btnChange.textContent = '← Volver al portal';
+      // Reemplazar el listener original (que abria el selector de usuarios)
+      var newBtn = btnChange.cloneNode(true);
+      btnChange.parentNode.replaceChild(newBtn, btnChange);
+      newBtn.addEventListener('click', function() {
+        // Guardar progreso antes de salir
+        try { saveUser(); } catch(e) {}
+        window.location.href = '../app/portal.html';
+      });
+    }
     // Cargar usuario y saltar directo a la pantalla de zonas
     loadUser(autoUser);
     loadVoices();
