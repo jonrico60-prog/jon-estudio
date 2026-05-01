@@ -1,0 +1,32 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+*.lnk
+
+# OneDrive
+.tmp.drivedownload/
+*.tmp
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*~
+
+# Logs
+*.log
+
+# Imagenes y archivos pesados sueltos en la raiz (evitar subir cosas como fotos personales)
+/*.jpg
+/*.jpeg
+/*.png
+/*.gif
+
+# Carpetas internas o privadas
+referencias/
+
+# Node / build (por si se anaden en el futuro)
+node_modules/
+dist/
+.env

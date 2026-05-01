@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal de Ejercicios</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .container { max-width: 850px; margin: 0 auto; }
+  .header { text-align: center; color: white; padding: 25px 0 15px; }
+  .header h1 { font-size: 2.2em; margin-bottom: 5px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+  .header p { font-size: 1em; opacity: 0.9; }
+  .avatar {
+    width: 70px; height: 70px; background: white; border-radius: 50%;
+    margin: 0 auto 12px; display: flex; align-items: center; justify-content: center;
+    font-size: 2.2em; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  .user-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    max-width: 850px; margin: 0 auto; padding: 0 5px;
+  }
+  .user-info { color: white; font-size: 1em; opacity: 0.9; }
+  .user-info strong { font-size: 1.1em; }
+  .btn-logout {
+    background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4);
+    padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85em;
+    font-family: inherit; transition: all 0.2s;
+  }
+  .btn-logout:hover { background: rgba(255,255,255,0.35); }
+  .breadcrumb {
+    color: rgba(255,255,255,0.8); font-size: 0.95em; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .breadcrumb span { cursor: pointer; text-decoration: underline; }
+  .breadcrumb span:hover { color: white; }
+  .breadcrumb .bc-current { cursor: default; text-decoration: none; color: white; font-weight: bold; }
+  .breadcrumb .bc-sep { opacity: 0.6; cursor: default; text-decoration: none; }
+  .btn-back {
+    display: inline-flex; align-items: center; gap: 6px; color: white;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 0.95em;
+    font-family: inherit; transition: all 0.2s; margin-bottom: 18px;
+  }
+  .btn-back:hover { background: rgba(255,255,255,0.3); }
+  .nav-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 550px) { .nav-grid { grid-template-columns: 1fr; } }
+  .nav-card {
+    background: white; border-radius: 14px; padding: 22px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer; text-align: center; border-left: 5px solid #667eea;
+    position: relative;
+  }
+  .nav-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+  .nav-card .card-icon { font-size: 2.5em; margin-bottom: 10px; }
+  .nav-card h3 { font-size: 1.2em; color: #2c3e50; margin-bottom: 4px; }
+  .nav-card p { font-size: 0.85em; color: #888; }
+  .nav-card.locked { opacity: 0.45; cursor: default; filter: grayscale(0.5); }
+  .nav-card.locked:hover { transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+  .lock-icon { position: absolute; top: 12px; right: 14px; font-size: 1.2em; opacity: 0.6; }
+  .phase-indicators { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+  .phase-dot {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 0.75em; padding: 3px 10px; border-radius: 12px; font-weight: 600;
+  }
+  .phase-dot.has-content { background: #d4edda; color: #155724; }
+  .phase-dot.no-content { background: #f0f0f0; color: #bbb; }
+  .phase-section { margin-bottom: 25px; }
+  .phase-title {
+    color: white; font-size: 1.25em; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .phase-title .phase-num {
+    width: 30px; height: 30px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-size: 0.85em;
+    font-weight: bold; color: white;
+  }
+  .phase-msg {
+    text-align: center; color: rgba(255,255,255,0.85); font-size: 1.05em;
+    margin-bottom: 25px; padding: 12px 20px; background: rgba(255,255,255,0.1);
+    border-radius: 10px; line-height: 1.5;
+  }
+  .exercise-card {
+    background: white; border-radius: 14px; padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none; color: #333; display: block; border-left: 5px solid #667eea;
+  }
+  .exercise-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+  .exercise-card h3 { font-size: 1.1em; margin-bottom: 5px; color: #2c3e50; }
+  .exercise-card p { font-size: 0.88em; color: #777; line-height: 1.4; }
+  .card-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 0.72em; font-weight: bold; color: white; margin-bottom: 6px;
+  }
+  .badge-easy { background: #28a745; }
+  .badge-medium { background: #f0ad4e; }
+  .badge-fill { background: #d4540e; }
+  .badge-video { background: #8e44ad; }
+  .badge-study { background: #3498db; }
+  .card-meta { margin-top: 8px; font-size: 0.78em; color: #aaa; display: flex; justify-content: space-between; }
+  .card-history { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e0e0e0; font-size: 0.8em; }
+  .card-history-title { color: #888; font-weight: 600; margin-bottom: 4px; }
+  .card-history-row { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; color: #666; }
+  .card-history-row .medal { font-size: 1.1em; }
+  .card-history-row .nota { font-weight: bold; }
+  .card-history-row .fecha { color: #aaa; font-size: 0.9em; }
+  .card-no-history { color: #bbb; font-style: italic; font-size: 0.85em; margin-top: 6px; }
+  .exercise-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px;
+    margin-bottom: 10px;
+  }
+  @media (max-width: 550px) { .exercise-grid { grid-template-columns: 1fr; } }
+  .empty-phase {
+    color: rgba(255,255,255,0.5); font-style: italic; font-size: 0.95em;
+    padding: 15px; text-align: center; background: rgba(255,255,255,0.05);
+    border-radius: 10px; border: 1px dashed rgba(255,255,255,0.2);
+  }
+  .footer { text-align: center; color: rgba(255,255,255,0.5); padding: 25px 0 10px; font-size: 0.83em; }
+</style>
+</head>
+<body>
+<div class="user-bar">
+  <span class="user-info">Kaixo, <strong id="user-name"></strong>!</span>
+  <button class="btn-logout" onclick="logout()">Cambiar usuario</button>
+</div>
+<div class="container">
+  <div class="header">
+    <div class="avatar">&#127891;</div>
+    <h1 id="portal-title">Ejercicios</h1>
+    <p>Tu portal de aprendizaje personalizado</p>
+  </div>
+  <div id="breadcrumb" class="breadcrumb"></div>
+  <div id="content"></div>
+  <div class="footer">Hecho con cariño para Jon · 2026</div>
+</div>
+<script src="tracker.js"></script>
+<script>
+requireLogin();
+var currentUser = getCurrentUser();
+document.getElementById('user-name').textContent = currentUser;
+document.getElementById('portal-title').textContent = 'Ejercicios de ' + currentUser;
+function logout() { localStorage.removeItem('jon_current_user'); window.location.href = 'index.html'; }
+
+var SITE = [
+  {
+    id: 'euskera', name: 'Euskera', icon: '\uD83D\uDFE2', color: '#27ae60',
+    phases: { study: 'Ikasi', practice: 'Praktikatu', exam: 'Azterketa' },
+    evaluations: [
+      { name: '1. Ebaluazioa', exams: [
+        { name: '1. Azterketa', study: [], practice: [], exam: [] },
+        { name: '2. Azterketa', study: [], practice: [], exam: [] }
+      ]},
+      { name: '2. Ebaluazioa', exams: [
+        { name: '1. Azterketa', study: [], practice: [], exam: [] },
+        { name: '2. Azterketa', study: [], practice: [], exam: [] }
+      ]},
+      { name: '3. Ebaluazioa', exams: [
+        { name: '1. Azterketa', study: [], practice: [], exam: [] },
+        { name: '2. Azterketa', study: [], practice: [], exam: [] }
+      ]}
+    ]
+  },
+  {
+    id: 'ingles', name: 'English', icon: '\uD83C\uDDEC\uD83C\uDDE7', color: '#e74c3c',
+    phases: { study: 'Study', practice: 'Practice', exam: 'Exam' },
+    evaluations: [
+      { name: '1st Evaluation', exams: [
+        { name: '1st Exam', study: [], practice: [], exam: [] },
+        { name: '2nd Exam', study: [], practice: [], exam: [] }
+      ]},
+      { name: '2nd Evaluation', exams: [
+        { name: '1st Exam', study: [], practice: [], exam: [] },
+        { name: '2nd Exam', study: [], practice: [], exam: [] }
+      ]},
+      { name: '3rd Evaluation', exams: [
+        { name: '1st Exam', study: [], practice: [], exam: [] },
+        { name: '2nd Exam', study: [], practice: [], exam: [] }
+      ]}
+    ]
+  },
+  {
+    id: 'spellingbee', name: 'Spelling Bee', icon: '\uD83D\uDC1D', color: '#f9a825',
+    directLink: '../ingles-spelling-bee/spelling_bee.html?auto=Jon',
+    desc: 'Practica de deletreo en ingles',
+    evaluations: []
+  },
+  {
+    id: 'lengua', name: 'Lengua', icon: '\uD83D\uDCD6', color: '#3498db',
+    phases: { study: 'Estudiar', practice: 'Practicar', exam: 'Examen' },
+    evaluations: [
+      { name: '1a Evaluacion', exams: [
+        { name: '1er Examen', study: [], practice: [], exam: [] },
+        { name: '2o Examen', study: [], practice: [], exam: [] }
+      ]},
+      { name: '2a Evaluacion', exams: [
+        { name: '1er Examen', study: [], practice: [], exam: [] },
+        { name: '2o Examen', study: [], practice: [], exam: [] }
+      ]},
+      { name: '3a Evaluacion', exams: [
+        { name: '1er Examen', study: [], practice: [], exam: [] },
+        { name: '2o Examen', study: [], practice: [], exam: [] }
+      ]}
+    ]
+  },
+  {
+    id: 'mates', name: 'Matematicas', icon: '\uD83D\uDCD0', color: '#e67e22',
+    phases: { study: 'Estudiar', practice: 'Practicar', exam: 'Examen' },
+    evaluations: [
+      { name: '1a Evaluacion', exams: [
+        { name: '1er Examen', study: [], practice: [], exam: [] },
+        { name: '2o Examen', study: [], practice: [], exam: [] }
+      ]},
+      { name: '2a Evaluacion', exams: [
+        { name: '1er Examen', study: [], practice: [], exam: [] },
+        { name: '2o Examen', study: [], practice: [], exam: [] }
+      ]},
+      { name: '3a Evaluacion', exams: [
+        { name: '1er Examen', study: [], practice: [], exam: [] },
+        { name: '2o Examen', study: [], practice: [], exam: [] }
+      ]}
+    ]
+  },
+  {
+    id: 'mates2', name: 'Matemáticas 2', icon: '\uD83E\uDDE0', color: '#c0392b',
+    directLink: 'Matematicas2/stalmat.html',
+    desc: 'Entrenamiento diario de mates avanzadas',
+    evaluations: []
+  },
+  {
+    id: 'gizarte', name: 'Gizarte', icon: '\uD83C\uDF0E', color: '#8e44ad',
+    phases: { study: 'Ikasi', practice: 'Praktikatu', exam: 'Azterketa' },
+    evaluations: [
+      { name: '1. Ebaluazioa', exams: [
+        { name: '1. Azterketa', study: [], practice: [], exam: [] },
+        { name: '2. Azterketa', study: [], practice: [], exam: [] }
+      ]},
+      { name: '2. Ebaluazioa', exams: [
+        { name: '1. Azterketa', study: [], practice: [], exam: [] },
+        { name: '2. Azterketa', study: [], practice: [], exam: [] }
+      ]},
+      { name: '3. Ebaluazioa', exams: [
+        { name: '1. Azterketa',
+          study: [
+            { title: 'Zirkulazioa eta Arnas Aparatua - Apunteak', href: 'Gizarte/ikasi_zirkulazioa_arnas.html', desc: 'Zirkulazio eta arnas aparatuen laburpena, flashcard-ekin', badge: 'Ikasi', badgeClass: 'badge-study', dataEx: '' }
+          ],
+          practice: [
+            { title: 'Zirkulazioa Aparatua - Quiz', href: 'Gizarte/zirkulazioa_quiz.html', desc: '15 galdera - Odola, bihotza, arteriak, zainak...', badge: 'Test', badgeClass: 'badge-easy', dataEx: 'Gizarte - Zirkulazioa Aparatua Quiz' },
+            { title: 'Arnas Aparatua - Quiz', href: 'Gizarte/arnas_aparatua_quiz.html', desc: '12 galdera - Birikak, bronkioak, albeoloak...', badge: 'Test', badgeClass: 'badge-medium', dataEx: 'Gizarte - Arnas Aparatua Quiz' }
+          ],
+          exam: []
+        },
+        { name: '2. Azterketa', study: [], practice: [], exam: [] }
+      ]}
+    ]
+  },
+  {
+    id: 'ajedrez', name: 'Ajedrez', icon: '\u265A', color: '#2c3e50',
+    phases: { study: 'Estudiar', practice: 'Practicar', exam: 'Examen' },
+    evaluations: [
+      { name: 'Tactica', exams: [
+        { name: 'Basico', study: [], practice: [], exam: [] },
+        { name: 'Intermedio', study: [], practice: [], exam: [] },
+        { name: 'Avanzado', study: [], practice: [], exam: [] }
+      ]},
+      { name: 'Aperturas', exams: [
+        { name: 'Basico', study: [], practice: [], exam: [] },
+        { name: 'Intermedio', study: [], practice: [], exam: [] }
+      ]},
+      { name: 'Finales', exams: [
+        { name: 'Basico', study: [], practice: [], exam: [] },
+        { name: 'Intermedio', study: [], practice: [], exam: [] }
+      ]}
+    ]
+  }
+];
+
+var state = { level: 'subjects', subjectIdx: null, evalIdx: null, examIdx: null };
+
+function hasContent(obj) {
+  if (obj.directLink) return true;
+  if (Array.isArray(obj)) return obj.length > 0;
+  if (obj.study || obj.practice || obj.exam) return obj.study.length > 0 || obj.practice.length > 0 || obj.exam.length > 0;
+  if (obj.exams) return obj.exams.some(function(e) { return hasContent(e); });
+  if (obj.evaluations) return obj.evaluations.some(function(ev) { return hasContent(ev); });
+  return false;
+}
+
+function renderBreadcrumb() {
+  var bc = document.getElementById('breadcrumb');
+  if (state.level === 'subjects') { bc.innerHTML = ''; return; }
+  var parts = [];
+  parts.push({ label: '\u{1F3E0} Inicio', action: function() { goSubjects(); } });
+  if (state.subjectIdx !== null) {
+    var subj = SITE[state.subjectIdx];
+    if (state.level === 'evaluations') parts.push({ label: subj.icon + ' ' + subj.name, action: null });
+    else parts.push({ label: subj.icon + ' ' + subj.name, action: function() { goEvaluations(state.subjectIdx); } });
+  }
+  if (state.evalIdx !== null && state.level !== 'evaluations') {
+    var ev = SITE[state.subjectIdx].evaluations[state.evalIdx];
+    if (state.level === 'exams') parts.push({ label: ev.name, action: null });
+    else parts.push({ label: ev.name, action: function() { goExams(state.subjectIdx, state.evalIdx); } });
+  }
+  if (state.examIdx !== null && state.level === 'exercises') {
+    parts.push({ label: SITE[state.subjectIdx].evaluations[state.evalIdx].exams[state.examIdx].name, action: null });
+  }
+  var html = '';
+  parts.forEach(function(p, i) {
+    if (i > 0) html += '<span class="bc-sep"> &gt; </span>';
+    if (p.action) html += '<span onclick="(' + p.action.toString() + ')()">' + p.label + '</span>';
+    else html += '<span class="bc-current">' + p.label + '</span>';
+  });
+  bc.innerHTML = html;
+}
+
+function renderBackBtn(fn) { return '<button class="btn-back" onclick="(' + fn.toString() + ')()">&#8592; Atzera / Volver</button>'; }
+
+function goSubjects() {
+  state = { level: 'subjects', subjectIdx: null, evalIdx: null, examIdx: null };
+  renderBreadcrumb();
+  var html = '<div class="nav-grid">';
+  SITE.forEach(function(s, i) {
+    var c = hasContent(s);
+    var clickAction = '';
+    if (s.directLink) clickAction = ' onclick="window.location.href=\'' + s.directLink + '\'"';
+    else if (c) clickAction = ' onclick="goEvaluations(' + i + ')"';
+    html += '<div class="nav-card' + (c ? '' : ' locked') + '" style="border-left-color:' + s.color + ';"' + clickAction + '>';
+    if (!c) html += '<span class="lock-icon">\u{1F512}</span>';
+    html += '<div class="card-icon">' + s.icon + '</div><h3>' + s.name + '</h3>';
+    html += '<p>' + (s.desc ? s.desc : (c ? 'Aukeratu ebaluazioa' : 'Laster... / Proximamente')) + '</p></div>';
+  });
+  html += '</div>';
+  document.getElementById('content').innerHTML = html;
+}
+
+function goEvaluations(si) {
+  state = { level: 'evaluations', subjectIdx: si, evalIdx: null, examIdx: null };
+  renderBreadcrumb();
+  var subj = SITE[si];
+  var html = renderBackBtn(function() { goSubjects(); });
+  html += '<div class="nav-grid">';
+  subj.evaluations.forEach(function(ev, ei) {
+    var c = hasContent(ev);
+    html += '<div class="nav-card' + (c ? '' : ' locked') + '" style="border-left-color:' + subj.color + ';"' + (c ? ' onclick="goExams(' + si + ',' + ei + ')"' : '') + '>';
+    if (!c) html += '<span class="lock-icon">\u{1F512}</span>';
+    html += '<div class="card-icon">' + (c ? '\u{1F4DA}' : '\u{1F512}') + '</div><h3>' + ev.name + '</h3>';
+    if (c) { var t=0; ev.exams.forEach(function(e){t+=e.study.length+e.practice.length+e.exam.length;}); html += '<p>' + t + ' ejercicio(s)</p>'; }
+    else html += '<p>Edukia laster / Contenido pronto</p>';
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('content').innerHTML = html;
+}
+
+function goExams(si, ei) {
+  state = { level: 'exams', subjectIdx: si, evalIdx: ei, examIdx: null };
+  renderBreadcrumb();
+  var subj = SITE[si], ev = subj.evaluations[ei], ph = subj.phases;
+  var html = renderBackBtn(function() { goEvaluations(state.subjectIdx); });
+  html += '<div class="nav-grid">';
+  ev.exams.forEach(function(ex, xi) {
+    var c = hasContent(ex);
+    html += '<div class="nav-card' + (c ? '' : ' locked') + '" style="border-left-color:' + subj.color + ';"' + (c ? ' onclick="goExercises(' + si + ',' + ei + ',' + xi + ')"' : '') + '>';
+    if (!c) html += '<span class="lock-icon">\u{1F512}</span>';
+    html += '<div class="card-icon">' + (c ? '\u{1F4DD}' : '\u{1F512}') + '</div><h3>' + ex.name + '</h3>';
+    html += '<div class="phase-indicators">';
+    html += '<span class="phase-dot ' + (ex.study.length > 0 ? 'has-content' : 'no-content') + '">' + ph.study + '</span>';
+    html += '<span class="phase-dot ' + (ex.practice.length > 0 ? 'has-content' : 'no-content') + '">' + ph.practice + '</span>';
+    html += '<span class="phase-dot ' + (ex.exam.length > 0 ? 'has-content' : 'no-content') + '">' + ph.exam + '</span>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('content').innerHTML = html;
+}
+
+function goExercises(si, ei, xi) {
+  state = { level: 'exercises', subjectIdx: si, evalIdx: ei, examIdx: xi };
+  renderBreadcrumb();
+  var subj = SITE[si], ex = subj.evaluations[ei].exams[xi], ph = subj.phases;
+  var html = renderBackBtn(function() { goExams(state.subjectIdx, state.evalIdx); });
+  html += '<div class="phase-msg">\u{1F4A1} Empieza por <strong>' + ph.study + '</strong>, sigue con <strong>' + ph.practice + '</strong> y termina con <strong>' + ph.exam + '</strong></div>';
+  var sections = [
+    { key: 'study', label: ph.study, bg: '#3498db' },
+    { key: 'practice', label: ph.practice, bg: '#27ae60' },
+    { key: 'exam', label: ph.exam, bg: '#e74c3c' }
+  ];
+  sections.forEach(function(sec, idx) {
+    html += '<div class="phase-section"><div class="phase-title"><span class="phase-num" style="background:' + sec.bg + ';">' + (idx+1) + '</span> ' + sec.label + '</div>';
+    if (ex[sec.key].length > 0) {
+      html += '<div class="exercise-grid">';
+      ex[sec.key].forEach(function(item) { html += renderExerciseCard(item, subj.color); });
+      html += '</div>';
+    } else {
+      html += '<div class="empty-phase">Edukia laster / Contenido pronto</div>';
+    }
+    html += '</div>';
+  });
+  document.getElementById('content').innerHTML = html;
+  renderCardHistories();
+}
+
+function renderExerciseCard(item, color) {
+  var h = '<a class="exercise-card" href="' + item.href + '" style="border-left-color:' + color + ';"';
+  if (item.dataEx) h += ' data-exercise="' + item.dataEx + '"';
+  h += '><span class="card-badge ' + item.badgeClass + '">' + item.badge + '</span>';
+  h += '<h3>' + item.title + '</h3><p>' + item.desc + '</p>';
+  if (item.dataEx) h += '<div class="card-history"></div>';
+  h += '</a>';
+  return h;
+}
+
+function renderCardHistories() {
+  var history = getHistory();
+  var byEx = {};
+  history.forEach(function(e) { if (!byEx[e.ejercicio]) byEx[e.ejercicio] = []; byEx[e.ejercicio].push(e); });
+  document.querySelectorAll('[data-exercise]').forEach(function(card) {
+    var name = card.getAttribute('data-exercise');
+    var hd = card.querySelector('.card-history');
+    if (!hd) return;
+    var att = byEx[name];
+    if (!att || att.length === 0) { hd.innerHTML = '<div class="card-no-history">Sin intentar</div>'; return; }
+    var h = '<div class="card-history-title">Ultimos intentos:</div>';
+    att.slice(0,3).forEach(function(a) {
+      var m = getMedal(a.nota);
+      h += '<div class="card-history-row"><span class="medal">' + m.icon + '</span><span class="nota" style="color:' + m.color + '">' + a.nota + '/10</span><span class="fecha">' + a.fecha + '</span></div>';
+    });
+    hd.innerHTML = h;
+  });
+}
+
+goSubjects();
+</script>
+</body>
+</html>

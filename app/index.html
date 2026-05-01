@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ejercicios de Jon - Entrar</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .login-container {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 35px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+  .avatar {
+    width: 90px; height: 90px; background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%; margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.8em; color: white;
+    box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+  }
+  h1 {
+    font-size: 1.8em; color: #2c3e50; margin-bottom: 8px;
+  }
+  .subtitle {
+    color: #888; font-size: 1em; margin-bottom: 30px;
+  }
+  .user-grid {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .user-btn {
+    display: flex; align-items: center; gap: 15px;
+    padding: 16px 20px;
+    border: 2px solid #e8e8e8;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    color: #333;
+    font-size: 1.15em;
+    font-family: inherit;
+    width: 100%;
+  }
+  .user-btn:hover {
+    border-color: #667eea;
+    background: #f0f2ff;
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(102,126,234,0.15);
+  }
+  .user-btn:active {
+    transform: translateX(2px);
+  }
+  .user-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4em; color: white; flex-shrink: 0;
+  }
+  .user-name { font-weight: 600; }
+  .footer {
+    margin-top: 25px; color: #bbb; font-size: 0.8em;
+  }
+</style>
+</head>
+<body>
+
+<div class="login-container">
+  <div class="avatar">&#127891;</div>
+  <h1>Kaixo!</h1>
+  <p class="subtitle">Nor zara? / Elige tu nombre para entrar</p>
+
+  <div class="user-grid">
+    <button class="user-btn" onclick="login('Jon')">
+      <div class="user-avatar" style="background:#3498db;">&#129430;</div>
+      <span class="user-name">Jon</span>
+    </button>
+    <button class="user-btn" onclick="login('Pruebas')">
+      <div class="user-avatar" style="background:#f39c12;">&#128295;</div>
+      <span class="user-name">Pruebas</span>
+    </button>
+    <button class="user-btn" onclick="login('Aita')">
+      <div class="user-avatar" style="background:#27ae60;">&#128104;</div>
+      <span class="user-name">Aita</span>
+    </button>
+  </div>
+
+  <div class="footer">Portal de ejercicios · 2026</div>
+</div>
+
+<script>
+function login(nombre) {
+  localStorage.setItem('jon_current_user', nombre);
+  window.location.href = 'portal.html';
+}
+</script>
+</body>
+</html>

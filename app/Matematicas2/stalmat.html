@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stalmat - Mates con Jon</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);min-height:100vh;color:#e0e0e0;overflow-x:hidden}
+.screen{display:none;padding:20px;max-width:700px;margin:0 auto;min-height:100vh}
+.screen.active{display:block}
+/* HEADER */
+.top-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 0;margin-bottom:10px}
+.btn-back{color:#aaa;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);padding:8px 16px;border-radius:10px;cursor:pointer;font-size:0.9em;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+.btn-back:hover{background:rgba(255,255,255,0.15);color:#fff}
+/* HOME */
+.mascot{font-size:5em;text-align:center;animation:bounce 2s infinite;margin:10px 0}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+.home-title{text-align:center;font-size:2em;font-weight:800;background:linear-gradient(90deg,#f9d423,#ff4e50);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:5px}
+.home-sub{text-align:center;color:#aaa;font-size:1em;margin-bottom:20px}
+.stats-row{display:flex;justify-content:center;gap:15px;margin-bottom:25px;flex-wrap:wrap}
+.stat-card{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:15px 20px;text-align:center;min-width:100px}
+.stat-val{font-size:1.8em;font-weight:bold}
+.stat-label{font-size:0.8em;color:#aaa;margin-top:2px}
+.menu-btns{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.menu-btn{padding:20px;border-radius:14px;border:none;cursor:pointer;font-size:1.15em;font-family:inherit;font-weight:600;display:flex;align-items:center;gap:15px;transition:all .2s;color:#fff}
+.menu-btn:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,0.3)}
+.menu-btn .icon{font-size:2em}
+.btn-mision{background:linear-gradient(135deg,#11998e,#38ef7d)}
+.btn-simulacro{background:linear-gradient(135deg,#fc4a1a,#f7b733)}
+.medals-section{background:rgba(255,255,255,0.05);border-radius:14px;padding:18px;margin-bottom:20px}
+.medals-section h3{font-size:1em;color:#aaa;margin-bottom:10px}
+.medals-grid{display:flex;flex-wrap:wrap;gap:8px}
+.medal{padding:6px 12px;border-radius:20px;font-size:0.85em;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#888}
+.medal.earned{background:rgba(255,215,0,0.15);border-color:rgba(255,215,0,0.3);color:#f9d423}
+/* MISSION / QUIZ */
+.phase-header{text-align:center;margin-bottom:20px}
+.phase-header h2{font-size:1.5em;margin-bottom:5px}
+.phase-header p{color:#aaa;font-size:0.95em}
+.phase-tag{display:inline-block;padding:4px 14px;border-radius:20px;font-size:0.8em;font-weight:600;margin-bottom:10px}
+.tag-a{background:rgba(56,239,125,0.15);color:#38ef7d}
+.tag-b{background:rgba(100,149,237,0.15);color:#6495ed}
+.tag-c{background:rgba(255,78,80,0.15);color:#ff4e50}
+.problem-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;margin-bottom:15px;transition:all .3s}
+.problem-card h3{font-size:1.15em;line-height:1.6;color:#f0f0f0;margin-bottom:15px}
+.problem-num{color:#aaa;font-size:0.8em;font-weight:600;margin-bottom:8px}
+.options{display:flex;flex-direction:column;gap:8px}
+.option{padding:14px 18px;border:2px solid rgba(255,255,255,0.12);border-radius:12px;cursor:pointer;font-size:1.05em;font-family:inherit;background:rgba(255,255,255,0.04);color:#e0e0e0;text-align:left;transition:all .2s}
+.option:hover{border-color:rgba(100,149,237,0.5);background:rgba(100,149,237,0.1)}
+.option.selected{border-color:#6495ed;background:rgba(100,149,237,0.15);font-weight:600}
+.option.correct{border-color:#38ef7d;background:rgba(56,239,125,0.15);color:#38ef7d}
+.option.wrong{border-color:#ff4e50;background:rgba(255,78,80,0.12);color:#ff6b6b}
+.option:disabled{cursor:default}
+.input-row{display:flex;gap:10px}
+.input-num{flex:1;padding:14px 18px;border:2px solid rgba(255,255,255,0.12);border-radius:12px;font-size:1.2em;font-family:inherit;background:rgba(255,255,255,0.04);color:#fff;outline:none}
+.input-num:focus{border-color:#6495ed}
+.input-num.correct{border-color:#38ef7d;background:rgba(56,239,125,0.1)}
+.input-num.wrong{border-color:#ff4e50;background:rgba(255,78,80,0.08)}
+.btn-send{padding:14px 28px;border:none;border-radius:12px;font-size:1.05em;font-family:inherit;cursor:pointer;font-weight:600;color:#fff;background:linear-gradient(135deg,#6495ed,#4169e1);transition:all .2s}
+.btn-send:hover{transform:translateY(-2px)}
+.btn-send:disabled{opacity:0.4;cursor:default;transform:none}
+.feedback-box{margin-top:12px;padding:12px 16px;border-radius:10px;font-size:0.95em;display:none;line-height:1.5}
+.feedback-box.show{display:block}
+.fb-ok{background:rgba(56,239,125,0.12);border:1px solid rgba(56,239,125,0.25);color:#38ef7d}
+.fb-fail{background:rgba(255,78,80,0.1);border:1px solid rgba(255,78,80,0.2);color:#ff6b6b}
+.btn-next{margin-top:15px;padding:14px;width:100%;border:none;border-radius:12px;font-size:1.1em;font-family:inherit;cursor:pointer;font-weight:600;color:#fff;background:linear-gradient(135deg,#11998e,#38ef7d);transition:all .2s}
+.btn-next:hover{transform:translateY(-2px)}
+/* PROGRESS */
+.progress-bar{width:100%;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;margin-bottom:20px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width .5s;background:linear-gradient(90deg,#38ef7d,#6495ed)}
+/* RESULTS */
+.result-box{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:30px;text-align:center;margin-bottom:20px}
+.result-box .big-score{font-size:3.5em;font-weight:800;margin:10px 0}
+.result-box .cal-badge{display:inline-block;padding:8px 24px;border-radius:10px;font-size:1.2em;font-weight:bold;color:#fff;margin-top:10px}
+.btn-home{margin-top:15px;padding:14px 30px;border:none;border-radius:12px;font-size:1.05em;font-family:inherit;cursor:pointer;font-weight:600;color:#fff;background:linear-gradient(135deg,#667eea,#764ba2);transition:all .2s}
+.btn-home:hover{transform:translateY(-2px)}
+/* SVG */
+svg.geo{display:block;margin:10px auto;max-width:250px}
+/* CONFETTI */
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden}
+.confetti-piece{position:absolute;width:10px;height:10px;top:-20px;animation:confetti-fall 3s ease-out forwards}
+@keyframes confetti-fall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
+/* SHAKE */
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake 0.4s}
+/* TIMER */
+.timer{text-align:center;font-size:1.1em;color:#aaa;margin-bottom:15px}
+.timer span{color:#f9d423;font-weight:bold}
+/* SIMULACRO REVIEW */
+.review-card{background:rgba(255,255,255,0.05);border-radius:12px;padding:18px;margin-bottom:12px;border-left:4px solid #555}
+.review-card.rev-ok{border-left-color:#38ef7d}
+.review-card.rev-fail{border-left-color:#ff4e50}
+.review-card h4{font-size:1em;color:#ccc;margin-bottom:6px}
+.review-card p{font-size:0.9em;color:#999;line-height:1.5}
+.review-answer{font-weight:600}
+.rev-correct{color:#38ef7d}
+.rev-wrong{color:#ff4e50}
+@media(max-width:500px){.stats-row{gap:8px}.stat-card{min-width:80px;padding:10px 14px}.stat-val{font-size:1.4em}.menu-btn{padding:16px;font-size:1em}}
+</style>
+</head>
+<body>
+
+<!-- ==================== HOME ==================== -->
+<div class="screen active" id="screen-home">
+  <div class="top-bar">
+    <a class="btn-back" href="../portal.html">&#8592; Portal</a>
+    <span style="color:#aaa;font-size:0.85em" id="home-date"></span>
+  </div>
+  <div class="mascot" id="mascot">&#129409;</div>
+  <div class="home-title">¡Hola, Jon!</div>
+  <div class="home-sub">Stalmat — Tu entrenamiento diario de mates</div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" style="color:#ff4e50" id="st-nivel">1</div><div class="stat-label">&#127947; Nivel</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#f9d423" id="st-racha">0</div><div class="stat-label">&#128293; Racha</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#38ef7d" id="st-puntos">0</div><div class="stat-label">&#11088; Puntos</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#6495ed" id="st-medallas">0</div><div class="stat-label">&#127942; Medallas</div></div>
+  </div>
+  <div class="menu-btns">
+    <button class="menu-btn btn-mision" onclick="startMission()"><span class="icon">&#9889;</span><div><div>Misión del día</div><div style="font-size:0.75em;font-weight:400;opacity:0.8">10-15 min · Calentamiento + Reto + Jefe</div></div></button>
+    <button class="menu-btn btn-simulacro" id="btn-sim" onclick="startSimulacro()"><span class="icon">&#127919;</span><div><div>Simulacro Stalmat</div><div style="font-size:0.75em;font-weight:400;opacity:0.8" id="sim-sub">20-25 min · Modo examen real</div></div></button>
+  </div>
+  <div class="medals-section" id="plan-section">
+    <h3>&#128197; Plan semanal</h3>
+    <div id="plan-grid" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+    <p id="plan-msg" style="color:#aaa;font-size:0.85em;margin-top:10px"></p>
+  </div>
+  <div class="medals-section">
+    <h3>&#127942; Tus medallas</h3>
+    <div class="medals-grid" id="medals-grid"></div>
+  </div>
+</div>
+
+<!-- ==================== MISSION ==================== -->
+<div class="screen" id="screen-mission">
+  <div class="top-bar">
+    <button class="btn-back" onclick="confirmExit()">&#8592; Salir</button>
+    <span style="color:#aaa;font-size:0.85em" id="mission-level-tag">Misión del día</span>
+  </div>
+  <div class="phase-header"><h2>&#9889; Misión del día</h2><p id="mission-sub">Responde todo y pulsa Verificar al final</p></div>
+  <div id="mission-area"></div>
+  <button class="btn-next" id="mission-check-btn" onclick="checkMission()" style="margin-bottom:20px">&#9989; Verificar todo</button>
+</div>
+
+<!-- ==================== SIMULACRO ==================== -->
+<div class="screen" id="screen-simulacro">
+  <div class="top-bar">
+    <button class="btn-back" onclick="confirmExit()">&#8592; Salir</button>
+    <span class="phase-tag tag-b">Simulacro</span>
+  </div>
+  <div class="phase-header"><h2>&#127919; Simulacro Stalmat</h2><p>Responde todas y comprueba al final</p></div>
+  <div class="timer" id="sim-timer">Tiempo: <span>25:00</span></div>
+  <div id="sim-area"></div>
+  <button class="btn-next" id="sim-check-btn" onclick="checkSimulacro()" style="margin-bottom:20px">&#9989; Comprobar todo</button>
+</div>
+
+<!-- ==================== RESULTS ==================== -->
+<div class="screen" id="screen-results">
+  <div class="top-bar"><span></span><span></span></div>
+  <div class="mascot" style="font-size:4em">&#129409;</div>
+  <div id="results-area"></div>
+  <div style="text-align:center;margin-top:20px">
+    <button class="btn-home" onclick="goHome()">&#127968; Volver al inicio</button>
+  </div>
+</div>
+
+<!-- ==================== SIMULACRO REVIEW ==================== -->
+<div class="screen" id="screen-sim-results">
+  <div class="top-bar"><span></span><span></span></div>
+  <div id="sim-results-area"></div>
+  <div id="sim-review-area"></div>
+  <div style="text-align:center;margin:20px 0">
+    <button class="btn-home" onclick="goHome()">&#127968; Volver al inicio</button>
+  </div>
+</div>
+
+<script>
+// ===== STORAGE =====
+var SKEY = 'stalmat_jon_progreso';
+function loadProgress() {
+  try { return JSON.parse(localStorage.getItem(SKEY)) || defaultProgress(); } catch(e) { return defaultProgress(); }
+}
+function defaultProgress() {
+  return { puntos:0, racha:0, lastDay:'', medallas:[], mejorSimulacro:0, totalMisiones:0, aciertosSeguidos:0, retosNotables:0, nivel:1, rachaNotable:0, rachaSuspenso:0, semana:'', retosSemana:0, simSemana:0 };
+}
+function saveProgress(p) { localStorage.setItem(SKEY, JSON.stringify(p)); }
+var prog = loadProgress();
+
+// ===== MEDALS DEFINITION =====
+var ALL_MEDALS = [
+  { id:'racha3',    icon:'&#128293;',     name:'Racha de 3 días',          cond: function(p){return p.racha>=3} },
+  { id:'racha7',    icon:'&#128293;&#128293;', name:'Racha de 7 días',     cond: function(p){return p.racha>=7} },
+  { id:'racha14',   icon:'&#128293;&#128293;&#128293;', name:'Racha de 14 días', cond: function(p){return p.racha>=14} },
+  { id:'jefe1',     icon:'&#127942;',     name:'Primer jefe vencido',       cond: function(p){return p.medallas.indexOf('jefe1')>=0} },
+  { id:'aciertos10',icon:'&#9889;',       name:'10 aciertos seguidos',      cond: function(p){return p.medallas.indexOf('aciertos10')>=0} },
+  { id:'sim1',      icon:'&#129504;',     name:'Primer simulacro superado', cond: function(p){return p.medallas.indexOf('sim1')>=0} },
+  { id:'sim100',    icon:'&#127919;',     name:'Simulacro perfecto',        cond: function(p){return p.medallas.indexOf('sim100')>=0} },
+  { id:'puntos500', icon:'&#11088;',      name:'500 puntos',                cond: function(p){return p.puntos>=500} },
+  { id:'puntos2000',icon:'&#127775;',     name:'2000 puntos',               cond: function(p){return p.puntos>=2000} },
+  { id:'misiones10',icon:'&#128640;',     name:'10 misiones completadas',   cond: function(p){return p.totalMisiones>=10} },
+  { id:'nivel2',    icon:'&#9757;',      name:'Nivel 2 alcanzado',         cond: function(p){return (p.nivel||1)>=2} },
+  { id:'nivel3',    icon:'&#128171;',    name:'Nivel 3 alcanzado',         cond: function(p){return (p.nivel||1)>=3} },
+  { id:'nivel4',    icon:'&#9889;',      name:'Nivel 4 alcanzado',         cond: function(p){return (p.nivel||1)>=4} },
+  { id:'nivel5',    icon:'&#128081;',    name:'Nivel 5 - ¡Máximo!',        cond: function(p){return (p.nivel||1)>=5} }
+];
+
+function earnMedal(id) {
+  if (prog.medallas.indexOf(id) < 0) { prog.medallas.push(id); saveProgress(prog); }
+}
+
+function checkAutoMedals() {
+  ALL_MEDALS.forEach(function(m) {
+    if (m.cond(prog) && prog.medallas.indexOf(m.id) < 0) prog.medallas.push(m.id);
+  });
+  saveProgress(prog);
+}
+
+// ===== HOME =====
+function goHome() {
+  prog = loadProgress();
+  checkAutoMedals();
+  showScreen('screen-home');
+  document.getElementById('st-nivel').textContent = prog.nivel || 1;
+  document.getElementById('st-racha').textContent = prog.racha;
+  document.getElementById('st-puntos').textContent = prog.puntos;
+  document.getElementById('st-medallas').textContent = prog.medallas.length;
+  document.getElementById('home-date').textContent = new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+  // medals
+  var mg = document.getElementById('medals-grid');
+  var html = '';
+  ALL_MEDALS.forEach(function(m) {
+    var earned = prog.medallas.indexOf(m.id) >= 0;
+    html += '<span class="medal' + (earned?' earned':'') + '">' + m.icon + ' ' + m.name + '</span>';
+  });
+  mg.innerHTML = html;
+  if (simTimer) { clearInterval(simTimer); simTimer = null; }
+  // Lock/unlock simulacro
+  var btnSim = document.getElementById('btn-sim');
+  var simSub = document.getElementById('sim-sub');
+  var rn = prog.retosNotables || 0;
+  if (rn >= 3) {
+    btnSim.disabled = false;
+    btnSim.style.opacity = '1';
+    btnSim.style.cursor = 'pointer';
+    simSub.textContent = '20-25 min · Modo examen real';
+  } else {
+    btnSim.disabled = true;
+    btnSim.style.opacity = '0.4';
+    btnSim.style.cursor = 'not-allowed';
+    simSub.innerHTML = '&#128274; Completa 3 retos con nota ≥ 7 para desbloquear (' + rn + '/3)';
+  }
+  // Weekly plan
+  renderPlan();
+}
+
+function getWeekId() {
+  var d = new Date();
+  var jan1 = new Date(d.getFullYear(), 0, 1);
+  var days = Math.floor((d - jan1) / 86400000);
+  var week = Math.ceil((days + jan1.getDay() + 1) / 7);
+  return d.getFullYear() + '-W' + week;
+}
+
+function renderPlan() {
+  var wk = getWeekId();
+  if (prog.semana !== wk) {
+    prog.semana = wk;
+    prog.retosSemana = 0;
+    prog.simSemana = 0;
+    saveProgress(prog);
+  }
+  // Plan: Lun=reto, Mar=descanso, Mié=reto, Jue=descanso, Vie=reto, Sáb=simulacro o reto, Dom=descanso
+  var plan = [
+    {dia:'Lun', tipo:'reto'},
+    {dia:'Mar', tipo:'descanso'},
+    {dia:'Mié', tipo:'reto'},
+    {dia:'Jue', tipo:'descanso'},
+    {dia:'Vie', tipo:'reto'},
+    {dia:'Sáb', tipo:'simulacro'},
+    {dia:'Dom', tipo:'descanso'}
+  ];
+  var hoy = new Date().getDay(); // 0=dom, 1=lun...
+  var diaIdx = hoy === 0 ? 6 : hoy - 1; // 0=lun...6=dom
+  var retosHechos = prog.retosSemana || 0;
+  var simHecho = prog.simSemana || 0;
+  var retosMeta = 3;
+  var simMeta = 1;
+
+  var grid = document.getElementById('plan-grid');
+  var html = '';
+  plan.forEach(function(p, i) {
+    var esHoy = (i === diaIdx);
+    var done = false;
+    if (p.tipo === 'reto') {
+      // Count completed retos up to this day
+      var retosHasta = 0;
+      for (var j = 0; j <= i; j++) { if (plan[j].tipo === 'reto') retosHasta++; }
+      done = retosHechos >= retosHasta;
+    } else if (p.tipo === 'simulacro') {
+      done = simHecho >= 1;
+    } else {
+      done = (i < diaIdx); // descanso pasado = done
+    }
+    var bg, color, border;
+    if (p.tipo === 'descanso') {
+      bg = 'rgba(255,255,255,0.03)'; color = '#555'; border = 'rgba(255,255,255,0.05)';
+    } else if (done) {
+      bg = 'rgba(56,239,125,0.15)'; color = '#38ef7d'; border = 'rgba(56,239,125,0.3)';
+    } else if (esHoy) {
+      bg = 'rgba(249,212,35,0.15)'; color = '#f9d423'; border = 'rgba(249,212,35,0.4)';
+    } else if (i < diaIdx) {
+      bg = 'rgba(255,78,80,0.1)'; color = '#ff6b6b'; border = 'rgba(255,78,80,0.2)';
+    } else {
+      bg = 'rgba(255,255,255,0.05)'; color = '#888'; border = 'rgba(255,255,255,0.1)';
+    }
+    var icon = p.tipo === 'descanso' ? '&#128564;' : (p.tipo === 'simulacro' ? '&#127919;' : '&#9889;');
+    if (done && p.tipo !== 'descanso') icon = '&#9989;';
+    html += '<div style="text-align:center;padding:8px 6px;border-radius:10px;min-width:42px;background:' + bg + ';border:1px solid ' + border + ';' + (esHoy ? 'box-shadow:0 0 8px rgba(249,212,35,0.3);' : '') + '">';
+    html += '<div style="font-size:0.7em;color:' + color + ';font-weight:' + (esHoy?'bold':'normal') + '">' + p.dia + '</div>';
+    html += '<div style="font-size:1.2em;margin-top:2px">' + icon + '</div>';
+    html += '</div>';
+  });
+  grid.innerHTML = html;
+
+  var msg = document.getElementById('plan-msg');
+  var falta = retosMeta - retosHechos;
+  if (falta <= 0 && simHecho >= simMeta) {
+    msg.innerHTML = '&#127881; ¡Semana completada! Descansa o practica más si quieres.';
+    msg.style.color = '#38ef7d';
+  } else {
+    var parts = [];
+    if (falta > 0) parts.push(falta + ' reto' + (falta > 1 ? 's' : '') + ' pendiente' + (falta > 1 ? 's' : ''));
+    if (simHecho < simMeta && (prog.retosNotables||0) >= 3) parts.push('1 simulacro pendiente');
+    msg.textContent = parts.join(' · ') || 'Haz tu reto de hoy para avanzar.';
+    msg.style.color = '#aaa';
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function confirmExit() {
+  if (confirm('¿Seguro que quieres salir? Perderás el progreso de esta sesión.')) goHome();
+}
+
+// ===== PROBLEM BANK =====
+// Calculo mental generators
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function shuffle(arr){for(var i=arr.length-1;i>0;i--){var j=rnd(0,i);var t=arr[i];arr[i]=arr[j];arr[j]=t}return arr}
+
+function genCalculo(diff) {
+  var templates = [];
+  if (diff <= 1) {
+    templates = [
+      function(){var a=rnd(10,99),b=rnd(10,99);return{q:'¿Cuánto es '+a+' + '+b+'?',a:a+b}},
+      function(){var a=rnd(50,200),b=rnd(10,a-1);return{q:'¿Cuánto es '+a+' - '+b+'?',a:a-b}},
+      function(){var a=rnd(2,9),b=rnd(2,9);return{q:'¿Cuánto es '+a+' × '+b+'?',a:a*b}},
+      function(){var b=rnd(2,9),a=b*rnd(2,10);return{q:'¿Cuánto es '+a+' ÷ '+b+'?',a:a/b}},
+      function(){var a=rnd(10,90);return{q:'¿Cuánto falta para llegar a 100 desde '+a+'?',a:100-a}},
+      function(){var a=rnd(4,50)*2;return{q:'¿Cuál es la mitad de '+a+'?',a:a/2}},
+      function(){var a=rnd(5,45);return{q:'¿Cuál es el doble de '+a+'?',a:a*2}}
+    ];
+  } else if (diff <= 2) {
+    templates = [
+      function(){var a=rnd(100,500),b=rnd(100,499);return{q:'¿Cuánto es '+a+' + '+b+'?',a:a+b}},
+      function(){var a=rnd(300,999),b=rnd(100,a-1);return{q:'¿Cuánto es '+a+' - '+b+'?',a:a-b}},
+      function(){var a=rnd(11,25),b=rnd(3,9);return{q:'¿Cuánto es '+a+' × '+b+'?',a:a*b}},
+      function(){var b=rnd(3,12),a=b*rnd(5,20);return{q:'¿Cuánto es '+a+' ÷ '+b+'?',a:a/b}},
+      function(){var a=rnd(100,900);return{q:'¿Cuánto falta para llegar a 1000 desde '+a+'?',a:1000-a}},
+      function(){var a=rnd(12,99)*2;return{q:'¿Cuál es la mitad de '+a+'?',a:a/2}},
+      function(){var a=rnd(25,150);return{q:'¿Cuál es el doble de '+a+'?',a:a*2}}
+    ];
+  } else {
+    templates = [
+      function(){var a=rnd(250,999),b=rnd(250,999);return{q:'¿Cuánto es '+a+' + '+b+'?',a:a+b}},
+      function(){var a=rnd(500,2000),b=rnd(100,a-1);return{q:'¿Cuánto es '+a+' - '+b+'?',a:a-b}},
+      function(){var a=rnd(12,50),b=rnd(6,12);return{q:'¿Cuánto es '+a+' × '+b+'?',a:a*b}},
+      function(){var b=rnd(4,15),a=b*rnd(10,30);return{q:'¿Cuánto es '+a+' ÷ '+b+'?',a:a/b}},
+      function(){var a=rnd(25,250)*4;return{q:'¿Cuánto es la cuarta parte de '+a+'?',a:a/4}},
+      function(){var a=rnd(50,250);return{q:'¿Cuál es el triple de '+a+'?',a:a*3}}
+    ];
+  }
+  var t = templates[rnd(0,templates.length-1)];
+  var p = t();
+  return { tipo:'calculo', dificultad:diff, enunciado:p.q, respuesta:p.a, inputType:'number' };
+}
+
+// Logic/reasoning problems
+var LOGICA = [
+  {d:1,q:'El robot R2-Mates tiene que seguir una secuencia: 2, 4, 6, 8, ... ¿Qué número sigue?',opts:['9','10','11','12'],c:1,ex:'Se suma 2 cada vez: 8 + 2 = 10.'},
+  {d:1,q:'Mira este patrón: 5, 10, 15, 20, ... ¿Cuál es el siguiente?',opts:['22','24','25','30'],c:2,ex:'Se suma 5 cada vez: 20 + 5 = 25.'},
+  {d:1,q:'Un dragón dice: "Tengo el doble de años que tú". Si Jon tiene 9 años, ¿cuántos tiene el dragón?',opts:['11','18','27','16'],c:1,ex:'Doble de 9 = 9 × 2 = 18.'},
+  {d:1,q:'En una carrera de robots, el primero llega en 10 segundos, el segundo en 12 y el tercero en 15. ¿Cuántos segundos tarda el tercero más que el primero?',opts:['3','5','2','7'],c:1,ex:'15 - 10 = 5 segundos.'},
+  {d:1,q:'En un barco pirata hay 3 cajas con 8 monedas cada una. ¿Cuántas monedas hay en total?',opts:['11','18','24','32'],c:2,ex:'3 × 8 = 24 monedas.'},
+  {d:2,q:'El capitán Barbarroja tiene 3 cofres con 24 monedas de oro cada uno. Si reparte el botín a partes iguales entre sus 6 piratas, ¿cuántas monedas recibe cada uno?',opts:['8','10','12','14'],c:2,ex:'Total: 3 × 24 = 72 monedas. Cada pirata: 72 ÷ 6 = 12.'},
+  {d:2,q:'Mira la secuencia: 1, 3, 7, 15, ... ¿Qué número sigue?',opts:['23','29','31','30'],c:2,ex:'Cada número es el anterior × 2 + 1: 15 × 2 + 1 = 31.'},
+  {d:2,q:'Una pizza se corta en 8 trozos. Si Jon y sus 3 amigos se comen 2 trozos cada uno, ¿cuántos sobran?',opts:['0','1','2','4'],c:0,ex:'Son 4 personas × 2 trozos = 8 trozos. Sobran 8 - 8 = 0.'},
+  {d:2,q:'Un robot planta 5 flores cada hora. ¿Cuántas flores planta en un día entero (24 horas)?',opts:['100','110','120','125'],c:2,ex:'5 × 24 = 120 flores.'},
+  {d:2,q:'En un torneo de ajedrez hay 8 jugadores. Si cada uno juega contra todos los demás exactamente una vez, ¿cuántas partidas se juegan?',opts:['28','32','56','64'],c:0,ex:'Cada jugador juega 7 partidas, pero cada partida se cuenta dos veces: 8 × 7 ÷ 2 = 28.'},
+  {d:2,q:'Un tren sale a las 9:15 y llega a las 11:00. ¿Cuántos minutos ha tardado?',opts:['95','105','115','145'],c:1,ex:'De 9:15 a 11:00 hay 1 hora y 45 min = 105 minutos.'},
+  {d:3,q:'Mira: 2, 5, 11, 23, ... ¿Qué número sigue?',opts:['35','45','47','46'],c:2,ex:'Cada número es el anterior × 2 + 1: 23 × 2 + 1 = 47.'},
+  {d:3,q:'Un mago dice: "Piensa un número, multiplícalo por 3 y suma 6. El resultado es 27." ¿Qué número pensó?',opts:['5','7','9','11'],c:1,ex:'Si el resultado es 27: 27 - 6 = 21, luego 21 ÷ 3 = 7.'},
+  {d:3,q:'En la final de fútbol galáctico, el equipo gana si mete más de la mitad de 20 penaltis. ¿Cuántos necesita meter como mínimo?',opts:['9','10','11','12'],c:2,ex:'Más de la mitad de 20 es más de 10. Como mínimo, 11.'},
+  {d:3,q:'Un dragón tiene el triple de escamas que su hermano. Entre los dos tienen 120 escamas. ¿Cuántas tiene el mayor?',opts:['30','60','80','90'],c:3,ex:'Si el pequeño tiene X, el grande tiene 3X. Total: 4X = 120, X = 30. El grande: 90.'},
+  // --- Nuevas d:1 ---
+  {d:1,q:'Un pirata cuenta sus monedas de 2 en 2: 2, 4, 6, 8. ¿Cuántas monedas tiene si llega hasta 10 pares?',opts:['10','15','18','20'],c:3,ex:'10 pares de 2 = 10 × 2 = 20 monedas.'},
+  {d:1,q:'Un robot fabrica 6 piezas cada hora. ¿Cuántas fabrica en 5 horas?',opts:['11','24','30','35'],c:2,ex:'6 × 5 = 30 piezas.'},
+  {d:1,q:'Si hoy es miércoles, ¿qué día será dentro de 5 días?',opts:['Domingo','Lunes','Sábado','Viernes'],c:1,ex:'Mié → Jue → Vie → Sáb → Dom → Lun. Dentro de 5 días es lunes.'},
+  // --- Nuevas d:2 ---
+  {d:2,q:'Una nave espacial lleva 4 astronautas. Cada uno come 3 raciones al día. ¿Cuántas raciones necesitan para un viaje de 7 días?',opts:['21','48','84','91'],c:2,ex:'4 × 3 × 7 = 84 raciones.'},
+  {d:2,q:'Mira la secuencia: 3, 6, 12, 24, ... ¿Qué número sigue?',opts:['30','36','48','42'],c:2,ex:'Se multiplica por 2 cada vez: 24 × 2 = 48.'},
+  {d:2,q:'Un mago tiene una caja con 36 cartas. Las reparte en 4 montones iguales y descarta uno. ¿Cuántas cartas le quedan?',opts:['24','27','32','28'],c:1,ex:'36 ÷ 4 = 9 cartas por montón. Descarta uno: 36 - 9 = 27.'},
+  // --- Nuevas d:3 ---
+  {d:3,q:'En un torneo de robots, cada ronda elimina la mitad. Si empiezan 64 robots, ¿cuántas rondas se necesitan para que quede uno?',opts:['4','5','6','8'],c:2,ex:'64→32→16→8→4→2→1. Son 6 rondas.'},
+  {d:3,q:'Un tren de dragones tiene 5 vagones. El primero lleva 2 pasajeros, y cada vagón lleva el doble que el anterior. ¿Cuántos pasajeros van en total?',opts:['30','32','62','64'],c:2,ex:'2 + 4 + 8 + 16 + 32 = 62 pasajeros.'},
+  {d:3,q:'Un pirata esconde su tesoro a 3 pasos al norte, luego 4 pasos al este. ¿A cuántos pasos en línea recta está el tesoro del inicio?',opts:['5','6','7','8'],c:0,ex:'Triángulo rectángulo: 3² + 4² = 9 + 16 = 25 → √25 = 5 pasos.'},
+  {d:3,q:'Si lanzas dos dados, ¿cuántas combinaciones diferentes puedes sacar en total?',opts:['12','24','30','36'],c:3,ex:'Cada dado tiene 6 caras: 6 × 6 = 36 combinaciones posibles.'}
+];
+
+// Geometry problems
+var GEOMETRIA = [
+  {d:1,q:'¿Cuántos lados tiene un cuadrado?',opts:['3','4','5','6'],c:1,ex:'Un cuadrado siempre tiene 4 lados iguales.',svg:'<svg class="geo" viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" fill="none" stroke="#6495ed" stroke-width="3"/></svg>'},
+  {d:1,q:'Un campo de fútbol rectangular mide 20 metros de largo y 10 de ancho. ¿Cuál es su perímetro?',opts:['30 m','40 m','60 m','200 m'],c:2,ex:'Perímetro = 2 × (20 + 10) = 60 metros.',svg:'<svg class="geo" viewBox="0 0 200 120"><rect x="10" y="10" width="180" height="80" fill="none" stroke="#38ef7d" stroke-width="3"/><text x="100" y="60" text-anchor="middle" fill="#aaa" font-size="14">20 × 10</text></svg>'},
+  {d:1,q:'¿Cuántos triángulos hay en esta figura?',opts:['2','3','4','5'],c:2,svg:'<svg class="geo" viewBox="0 0 120 110"><polygon points="60,10 10,100 110,100" fill="none" stroke="#6495ed" stroke-width="2.5"/><line x1="60" y1="10" x2="60" y2="100" stroke="#f9d423" stroke-width="2"/><line x1="60" y1="10" x2="35" y2="55" stroke="#ff4e50" stroke-width="1.5" stroke-dasharray="4"/></svg>',ex:'Hay 4 triángulos: el grande, 2 que forma la línea vertical, y 1 más pequeño con la línea diagonal.'},
+  {d:2,q:'Un cuadrado tiene un lado de 7 cm. ¿Cuál es su área?',opts:['14 cm²','28 cm²','49 cm²','21 cm²'],c:2,ex:'Área = 7 × 7 = 49 cm².',svg:'<svg class="geo" viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" fill="rgba(100,149,237,0.15)" stroke="#6495ed" stroke-width="2.5"/><text x="50" y="95" text-anchor="middle" fill="#aaa" font-size="12">7 cm</text></svg>'},
+  {d:2,q:'Un rectángulo mide 12 cm de largo y 5 cm de ancho. ¿Cuál es su área?',opts:['34 cm²','17 cm²','60 cm²','50 cm²'],c:2,ex:'Área = 12 × 5 = 60 cm².',svg:'<svg class="geo" viewBox="0 0 200 100"><rect x="10" y="15" width="180" height="70" fill="rgba(56,239,125,0.1)" stroke="#38ef7d" stroke-width="2.5"/><text x="100" y="55" text-anchor="middle" fill="#aaa" font-size="13">12 × 5</text></svg>'},
+  {d:2,q:'En el castillo del dragón hay 4 torres. Cada torre tiene 3 ventanas, y en cada ventana hay 2 murciélagos. ¿Cuántos murciélagos hay en total?',opts:['9','12','18','24'],c:3,ex:'4 × 3 × 2 = 24 murciélagos.',svg:'<svg class="geo" viewBox="0 0 200 100"><rect x="10" y="40" width="180" height="55" fill="rgba(100,100,100,0.15)" stroke="#aaa" stroke-width="2"/><rect x="20" y="10" width="25" height="35" fill="rgba(100,100,100,0.1)" stroke="#aaa" stroke-width="1.5"/><rect x="65" y="10" width="25" height="35" fill="rgba(100,100,100,0.1)" stroke="#aaa" stroke-width="1.5"/><rect x="110" y="10" width="25" height="35" fill="rgba(100,100,100,0.1)" stroke="#aaa" stroke-width="1.5"/><rect x="155" y="10" width="25" height="35" fill="rgba(100,100,100,0.1)" stroke="#aaa" stroke-width="1.5"/></svg>'},
+  {d:2,q:'¿Cuántos cuadrados hay en esta figura? (mira bien, hay pequeños y uno grande)',opts:['4','5','6','9'],c:1,svg:'<svg class="geo" viewBox="0 0 120 120"><rect x="10" y="10" width="100" height="100" fill="none" stroke="#6495ed" stroke-width="2.5"/><line x1="60" y1="10" x2="60" y2="110" stroke="#6495ed" stroke-width="2"/><line x1="10" y1="60" x2="110" y2="60" stroke="#6495ed" stroke-width="2"/></svg>',ex:'4 cuadrados pequeños + 1 cuadrado grande = 5 cuadrados.'},
+  {d:3,q:'Un triángulo tiene una base de 10 cm y una altura de 6 cm. ¿Cuál es su área?',opts:['60 cm²','16 cm²','30 cm²','20 cm²'],c:2,ex:'Área del triángulo = (base × altura) ÷ 2 = (10 × 6) ÷ 2 = 30 cm².',svg:'<svg class="geo" viewBox="0 0 160 100"><polygon points="10,90 150,90 80,15" fill="rgba(249,212,35,0.1)" stroke="#f9d423" stroke-width="2.5"/><line x1="80" y1="15" x2="80" y2="90" stroke="#ff4e50" stroke-width="1.5" stroke-dasharray="5"/><text x="80" y="105" text-anchor="middle" fill="#aaa" font-size="11">10 cm</text><text x="90" y="55" fill="#aaa" font-size="10">6 cm</text></svg>'},
+  {d:3,q:'¿Cuántas líneas de simetría tiene un cuadrado?',opts:['1','2','4','8'],c:2,ex:'Un cuadrado tiene 4 ejes de simetría: 2 por las diagonales y 2 por los puntos medios de los lados.',svg:'<svg class="geo" viewBox="0 0 120 120"><rect x="20" y="20" width="80" height="80" fill="none" stroke="#6495ed" stroke-width="2"/><line x1="20" y1="20" x2="100" y2="100" stroke="#f9d423" stroke-width="1.5" stroke-dasharray="5"/><line x1="100" y1="20" x2="20" y2="100" stroke="#f9d423" stroke-width="1.5" stroke-dasharray="5"/><line x1="60" y1="20" x2="60" y2="100" stroke="#38ef7d" stroke-width="1.5" stroke-dasharray="5"/><line x1="20" y1="60" x2="100" y2="60" stroke="#38ef7d" stroke-width="1.5" stroke-dasharray="5"/></svg>'},
+  {d:3,q:'Un hexágono regular tiene todos los lados de 5 cm. ¿Cuál es su perímetro?',opts:['25 cm','30 cm','35 cm','20 cm'],c:1,ex:'Un hexágono tiene 6 lados: 6 × 5 = 30 cm.',svg:'<svg class="geo" viewBox="0 0 120 120"><polygon points="60,10 105,35 105,85 60,110 15,85 15,35" fill="none" stroke="#ff4e50" stroke-width="2.5"/><text x="60" y="65" text-anchor="middle" fill="#aaa" font-size="11">5 cm</text></svg>'},
+  // --- Nuevas d:1 ---
+  {d:1,q:'¿Cuántos vértices tiene un triángulo?',opts:['2','3','4','5'],c:1,ex:'Un triángulo siempre tiene 3 vértices (esquinas).',svg:'<svg class="geo" viewBox="0 0 120 110"><polygon points="60,10 10,100 110,100" fill="none" stroke="#38ef7d" stroke-width="3"/><circle cx="60" cy="10" r="4" fill="#f9d423"/><circle cx="10" cy="100" r="4" fill="#f9d423"/><circle cx="110" cy="100" r="4" fill="#f9d423"/></svg>'},
+  {d:1,q:'Un cuadrado tiene un lado de 5 cm. ¿Cuál es su perímetro?',opts:['10 cm','15 cm','20 cm','25 cm'],c:2,ex:'Perímetro = 4 × 5 = 20 cm.',svg:'<svg class="geo" viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" fill="none" stroke="#6495ed" stroke-width="3"/><text x="50" y="95" text-anchor="middle" fill="#aaa" font-size="12">5 cm</text></svg>'},
+  {d:1,q:'¿Qué forma tiene una pelota de fútbol?',opts:['Cubo','Esfera','Cilindro','Pirámide'],c:1,ex:'Una pelota es redonda: tiene forma de esfera.'},
+  {d:1,q:'¿Cuántas caras tiene un cubo?',opts:['4','5','6','8'],c:2,ex:'Un cubo tiene 6 caras cuadradas.',svg:'<svg class="geo" viewBox="0 0 120 120"><polygon points="30,80 90,80 90,30 30,30" fill="none" stroke="#6495ed" stroke-width="2"/><polygon points="30,30 50,15 110,15 90,30" fill="none" stroke="#6495ed" stroke-width="2"/><polygon points="90,30 110,15 110,65 90,80" fill="none" stroke="#6495ed" stroke-width="2"/></svg>'},
+  {d:1,q:'¿Cuántos ángulos rectos (90°) tiene un rectángulo?',opts:['2','3','4','6'],c:2,ex:'Un rectángulo siempre tiene 4 ángulos rectos.'},
+  // --- Nuevas d:2 ---
+  {d:2,q:'Un rombo tiene diagonales de 8 cm y 6 cm. ¿Cuál es su área?',opts:['14 cm²','24 cm²','48 cm²','36 cm²'],c:1,ex:'Área del rombo = (D × d) ÷ 2 = (8 × 6) ÷ 2 = 24 cm².',svg:'<svg class="geo" viewBox="0 0 120 120"><polygon points="60,10 110,60 60,110 10,60" fill="rgba(249,212,35,0.1)" stroke="#f9d423" stroke-width="2.5"/><line x1="60" y1="10" x2="60" y2="110" stroke="#aaa" stroke-width="1" stroke-dasharray="4"/><line x1="10" y1="60" x2="110" y2="60" stroke="#aaa" stroke-width="1" stroke-dasharray="4"/></svg>'},
+  {d:2,q:'Un pentágono regular tiene lados de 6 cm. ¿Cuál es su perímetro?',opts:['24 cm','30 cm','36 cm','18 cm'],c:1,ex:'Un pentágono tiene 5 lados: 5 × 6 = 30 cm.',svg:'<svg class="geo" viewBox="0 0 120 120"><polygon points="60,10 110,45 95,100 25,100 10,45" fill="none" stroke="#ff4e50" stroke-width="2.5"/><text x="60" y="65" text-anchor="middle" fill="#aaa" font-size="11">6 cm</text></svg>'},
+  {d:2,q:'Un terreno cuadrado tiene un perímetro de 48 metros. ¿Cuánto mide cada lado?',opts:['8 m','10 m','12 m','16 m'],c:2,ex:'Cada lado = 48 ÷ 4 = 12 metros.'},
+  {d:2,q:'¿Cuántas aristas tiene un cubo?',opts:['6','8','10','12'],c:3,ex:'Un cubo tiene 12 aristas: 4 arriba, 4 abajo, 4 verticales.',svg:'<svg class="geo" viewBox="0 0 120 120"><polygon points="30,80 90,80 90,30 30,30" fill="none" stroke="#6495ed" stroke-width="2"/><polygon points="30,30 50,15 110,15 90,30" fill="none" stroke="#6495ed" stroke-width="2"/><polygon points="90,30 110,15 110,65 90,80" fill="none" stroke="#6495ed" stroke-width="2"/><line x1="30" y1="80" x2="50" y2="65" stroke="#6495ed" stroke-width="1.5" stroke-dasharray="4"/><line x1="50" y1="65" x2="110" y2="65" stroke="#6495ed" stroke-width="1.5" stroke-dasharray="4"/><line x1="50" y1="65" x2="50" y2="15" stroke="#6495ed" stroke-width="1.5" stroke-dasharray="4"/></svg>'},
+  {d:2,q:'Un jardín circular tiene un radio de 7 metros. ¿Cuál es su diámetro?',opts:['7 m','10 m','14 m','21 m'],c:2,ex:'El diámetro es el doble del radio: 7 × 2 = 14 metros.',svg:'<svg class="geo" viewBox="0 0 120 120"><circle cx="60" cy="60" r="45" fill="none" stroke="#38ef7d" stroke-width="2.5"/><line x1="60" y1="60" x2="105" y2="60" stroke="#f9d423" stroke-width="2"/><text x="80" y="55" fill="#aaa" font-size="10">7 m</text></svg>'},
+  // --- Nuevas d:3 ---
+  {d:3,q:'Un trapecio tiene bases de 10 cm y 6 cm, y una altura de 4 cm. ¿Cuál es su área?',opts:['24 cm²','32 cm²','40 cm²','60 cm²'],c:1,ex:'Área = (B + b) × h ÷ 2 = (10 + 6) × 4 ÷ 2 = 32 cm².',svg:'<svg class="geo" viewBox="0 0 180 100"><polygon points="20,85 160,85 120,20 60,20" fill="rgba(100,149,237,0.1)" stroke="#6495ed" stroke-width="2.5"/><text x="90" y="100" text-anchor="middle" fill="#aaa" font-size="10">10 cm</text><text x="90" y="15" text-anchor="middle" fill="#aaa" font-size="10">6 cm</text></svg>'},
+  {d:3,q:'Un cubo tiene aristas de 3 cm. ¿Cuál es su superficie total?',opts:['27 cm²','36 cm²','54 cm²','72 cm²'],c:2,ex:'Cada cara = 3 × 3 = 9 cm². Son 6 caras: 6 × 9 = 54 cm².',svg:'<svg class="geo" viewBox="0 0 120 120"><polygon points="30,80 90,80 90,30 30,30" fill="rgba(100,149,237,0.1)" stroke="#6495ed" stroke-width="2"/><polygon points="30,30 50,15 110,15 90,30" fill="rgba(100,149,237,0.05)" stroke="#6495ed" stroke-width="2"/><polygon points="90,30 110,15 110,65 90,80" fill="rgba(100,149,237,0.08)" stroke="#6495ed" stroke-width="2"/><text x="60" y="60" text-anchor="middle" fill="#aaa" font-size="11">3 cm</text></svg>'},
+  {d:3,q:'Un círculo tiene un diámetro de 10 cm. Su circunferencia es aprox. π × d. Si π ≈ 3, ¿cuánto mide?',opts:['15 cm','20 cm','30 cm','40 cm'],c:2,ex:'Circunferencia ≈ 3 × 10 = 30 cm.',svg:'<svg class="geo" viewBox="0 0 120 120"><circle cx="60" cy="60" r="45" fill="none" stroke="#ff4e50" stroke-width="2.5"/><line x1="15" y1="60" x2="105" y2="60" stroke="#f9d423" stroke-width="2"/><text x="60" y="55" text-anchor="middle" fill="#aaa" font-size="10">10 cm</text></svg>'},
+  {d:3,q:'¿Cuántos vértices tiene un octaedro (dos pirámides unidas por la base)?',opts:['4','6','8','12'],c:1,ex:'Un octaedro tiene 6 vértices: 1 arriba, 4 en el medio y 1 abajo.'},
+  {d:3,q:'Un rectángulo tiene un perímetro de 30 cm y un lado de 10 cm. ¿Cuál es su área?',opts:['50 cm²','75 cm²','100 cm²','150 cm²'],c:0,ex:'Si un lado mide 10, el otro mide (30 - 2×10) ÷ 2 = 5 cm. Área = 10 × 5 = 50 cm².'}
+];
+
+// Story problems
+var PROBLEMAS = [
+  {d:1,q:'Jon tiene 15 cromos y su amigo le regala 8 más. Después cambia 5 por una carta especial. ¿Cuántos cromos tiene Jon ahora?',opts:['18','20','23','28'],c:0,ex:'15 + 8 = 23, luego 23 - 5 = 18 cromos.'},
+  {d:1,q:'En la clase de Jon hay 28 alumnos. Si se hacen equipos de 4, ¿cuántos equipos salen?',opts:['6','7','8','9'],c:1,ex:'28 ÷ 4 = 7 equipos.'},
+  {d:1,q:'Un autobús escolar tiene 12 filas con 2 asientos a cada lado. ¿Cuántos alumnos caben sentados?',opts:['24','36','48','44'],c:2,ex:'12 filas × 4 asientos por fila = 48 alumnos.'},
+  {d:1,q:'Una bolsa tiene 30 gominolas. Jon coge la tercera parte. ¿Cuántas coge?',opts:['3','10','15','20'],c:1,ex:'30 ÷ 3 = 10 gominolas.'},
+  {d:2,q:'Un cohete espacial viaja a 500 km por hora. ¿Cuántos km recorre en 3 horas y media?',opts:['1500','1700','1750','2000'],c:2,ex:'500 × 3.5 = 1750 km.'},
+  {d:2,q:'En una tienda, 3 cómics cuestan 12€. ¿Cuánto cuestan 7 cómics?',opts:['21€','24€','28€','36€'],c:2,ex:'1 cómic = 12 ÷ 3 = 4€. 7 cómics = 7 × 4 = 28€.'},
+  {d:2,q:'Jon ahorra 5€ cada semana. ¿Cuántas semanas necesita para comprar un juego de 45€?',opts:['7','8','9','10'],c:2,ex:'45 ÷ 5 = 9 semanas.'},
+  {d:2,q:'En una piscina caben 200 litros. Un grifo echa 25 litros por minuto. ¿En cuántos minutos se llena?',opts:['5','6','8','10'],c:2,ex:'200 ÷ 25 = 8 minutos.'},
+  {d:2,q:'Un partido de fútbol dura 90 minutos. Jon llega 15 minutos tarde y se va 10 minutos antes del final. ¿Cuántos minutos ve?',opts:['55','60','65','75'],c:2,ex:'90 - 15 - 10 = 65 minutos.'},
+  {d:3,q:'Un granjero tiene gallinas y conejos. En total hay 10 cabezas y 28 patas. ¿Cuántas gallinas hay?',opts:['4','5','6','7'],c:2,ex:'Si hay G gallinas y C conejos: G + C = 10 y 2G + 4C = 28. C = (28-20)/2 = 4. Gallinas = 6.'},
+  {d:3,q:'Un reloj marca las 3:45. ¿Cuántos minutos faltan para las 5:20?',opts:['75','85','95','105'],c:2,ex:'De 3:45 a 5:20: de 3:45 a 5:00 son 75 min, + 20 min = 95 minutos.'},
+  {d:3,q:'Jon tiene el doble de edad que su primo. Dentro de 3 años, la suma de sus edades será 27. ¿Cuántos años tiene Jon ahora?',opts:['10','12','14','16'],c:2,ex:'Jon = 2X, primo = X. Dentro de 3 años: (2X+3)+(X+3) = 27, 3X+6 = 27, X = 7. Jon tiene 14.'},
+  {d:3,q:'En un estante hay libros de 3 colores: 12 rojos, 8 azules y 5 verdes. Si cojo uno sin mirar, ¿cuántos libros hay en total?',opts:['20','23','25','26'],c:2,ex:'12 + 8 + 5 = 25 libros.'},
+  {d:3,q:'Un cubo tiene aristas de 4 cm. ¿Cuál es el volumen del cubo?',opts:['12 cm³','16 cm³','48 cm³','64 cm³'],c:3,ex:'Volumen = 4 × 4 × 4 = 64 cm³.'},
+  // --- Nuevas d:1 ---
+  {d:1,q:'Jon compra 3 paquetes de galletas con 6 galletas cada uno. Se come 4. ¿Cuántas le quedan?',opts:['10','12','14','16'],c:2,ex:'3 × 6 = 18 galletas. 18 - 4 = 14 galletas.'},
+  {d:1,q:'En una granja hay 5 vacas y cada una da 4 litros de leche al día. ¿Cuántos litros dan en total?',opts:['9','15','20','24'],c:2,ex:'5 × 4 = 20 litros.'},
+  {d:1,q:'Jon tiene 50 canicas y pierde 12 en el recreo. Luego su amigo le da 7. ¿Cuántas tiene?',opts:['31','38','45','55'],c:2,ex:'50 - 12 = 38, luego 38 + 7 = 45 canicas.'},
+  {d:1,q:'En una estantería hay 4 filas con 8 libros cada una. ¿Cuántos libros hay en total?',opts:['12','24','32','36'],c:2,ex:'4 × 8 = 32 libros.'},
+  // --- Nuevas d:2 ---
+  {d:2,q:'Un tren lleva 6 vagones con 45 pasajeros cada uno. En una parada bajan 30 y suben 15. ¿Cuántos van ahora?',opts:['240','255','270','285'],c:1,ex:'6 × 45 = 270. Bajan 30: 270 - 30 = 240. Suben 15: 240 + 15 = 255.'},
+  {d:2,q:'Una pista de carreras mide 400 metros. Un corredor da 3 vueltas y media. ¿Cuántos metros recorre?',opts:['1200','1300','1400','1600'],c:2,ex:'3.5 × 400 = 1400 metros.'},
+  {d:2,q:'Jon compra 2 camisetas a 15€ cada una y un pantalón a 25€. Paga con un billete de 100€. ¿Cuánto le devuelven?',opts:['35€','40€','45€','55€'],c:2,ex:'2 × 15 + 25 = 55€ gastados. 100 - 55 = 45€ de cambio.'},
+  {d:2,q:'Un avión vuela a 800 km/h. ¿Cuánto tarda en recorrer 2000 km?',opts:['2 h','2 h 15 min','2 h 30 min','3 h'],c:2,ex:'2000 ÷ 800 = 2.5 horas = 2 horas y 30 minutos.'},
+  // --- Nuevas d:3 ---
+  {d:3,q:'Una tienda hace un 25% de descuento en una bici de 120€. ¿Cuánto cuesta ahora?',opts:['80€','85€','90€','95€'],c:2,ex:'25% de 120 = 30€ de descuento. 120 - 30 = 90€.'},
+  {d:3,q:'Jon lee 15 páginas al día. Un libro tiene 200 páginas. ¿En cuántos días lo acaba? (redondeando)',opts:['12','13','14','15'],c:2,ex:'200 ÷ 15 = 13.3... Necesita 14 días para acabarlo.'},
+  {d:3,q:'Tres amigos compran un regalo de 48€. Jon pone el doble que cada uno de los otros dos. ¿Cuánto pone Jon?',opts:['16€','20€','24€','28€'],c:2,ex:'Si cada amigo pone X, Jon pone 2X. Total: 2X + X + X = 4X = 48. X = 12€. Jon pone 24€.'},
+  {d:3,q:'Un depósito pierde 3 litros de agua por hora. Si tiene 150 litros, ¿en cuántas horas se vacía?',opts:['30','45','50','60'],c:2,ex:'150 ÷ 3 = 50 horas.'}
+];
+
+function getProblems(tipo, diff, n) {
+  var pool;
+  if (tipo === 'logica') pool = LOGICA;
+  else if (tipo === 'geo') pool = GEOMETRIA;
+  else pool = PROBLEMAS;
+  var filtered = pool.filter(function(p){return p.d <= diff + 1 && p.d >= diff - 1});
+  if (filtered.length < n) filtered = pool.slice();
+  shuffle(filtered);
+  return filtered.slice(0, n);
+}
+
+// ===== MISSION (all-at-once, verify at end) =====
+var missionAll = []; // all problems [{type,problem,selection}]
+
+// Mapeo nivel (1-5) a dificultad (1-3) para cada fase
+function nivelToDiff(nivel, fase) {
+  // nivel 1: A=1, B=1, C=2
+  // nivel 2: A=1, B=2, C=2
+  // nivel 3: A=2, B=2, C=3
+  // nivel 4: A=2, B=3, C=3
+  // nivel 5: A=3, B=3, C=3
+  var n = nivel || 1;
+  var map = {
+    1: {A:1, B:1, C:2},
+    2: {A:1, B:2, C:2},
+    3: {A:2, B:2, C:3},
+    4: {A:2, B:3, C:3},
+    5: {A:3, B:3, C:3}
+  };
+  return (map[n] || map[1])[fase];
+}
+
+function startMission() {
+  missionAll = [];
+  var niv = prog.nivel || 1;
+  var diffA = nivelToDiff(niv, 'A');
+  var diffB = nivelToDiff(niv, 'B');
+  var diffC = nivelToDiff(niv, 'C');
+  // Phase A: 5 calculo mental
+  for (var i = 0; i < 5; i++) {
+    missionAll.push({ phase:'A', prob: genCalculo(diffA), sel: null });
+  }
+  // Phase B: 5 mixed (2 logica + 1 geo + 2 problemas)
+  var logic = getProblems('logica', diffB, 2);
+  var geo = getProblems('geo', diffB, 1);
+  var story = getProblems('problemas', diffB, 2);
+  var mixed = [].concat(logic, geo, story);
+  shuffle(mixed);
+  mixed.forEach(function(p) { missionAll.push({ phase:'B', prob: p, sel: null }); });
+  // Phase C: 1 boss
+  var bossPool = LOGICA.concat(GEOMETRIA).concat(PROBLEMAS).filter(function(p){return p.d >= diffC});
+  if (bossPool.length === 0) bossPool = LOGICA.concat(GEOMETRIA).concat(PROBLEMAS).filter(function(p){return p.d >= 2});
+  shuffle(bossPool);
+  missionAll.push({ phase:'C', prob: bossPool[0], sel: null });
+
+  showScreen('screen-mission');
+  document.getElementById('mission-level-tag').textContent = 'Nivel ' + niv + ' / 5';
+  document.getElementById('mission-sub').textContent = 'Nivel ' + niv + ' · Responde todo y pulsa Verificar al final';
+  renderMissionAll();
+}
+
+function renderMissionAll() {
+  var area = document.getElementById('mission-area');
+  var html = '';
+  var globalIdx = 0;
+  var currentPhase = '';
+  missionAll.forEach(function(item, qi) {
+    // Phase header
+    if (item.phase !== currentPhase) {
+      currentPhase = item.phase;
+      if (currentPhase === 'A') html += '<div style="margin:15px 0 10px"><span class="phase-tag tag-a">Fase A · Calentamiento</span></div>';
+      else if (currentPhase === 'B') html += '<div style="margin:20px 0 10px"><span class="phase-tag tag-b">Fase B · Reto del día</span></div>';
+      else if (currentPhase === 'C') html += '<div style="margin:20px 0 10px"><span class="phase-tag tag-c">Fase C · Jefe final</span></div>';
+    }
+    globalIdx++;
+    var p = item.prob;
+    html += '<div class="problem-card" id="mq' + qi + '">';
+    html += '<div class="problem-num">' + globalIdx + ' / ' + missionAll.length + '</div>';
+    if (p.inputType === 'number') {
+      html += '<h3>' + p.enunciado + '</h3>';
+      html += '<div class="input-row"><input class="input-num" type="number" id="minp' + qi + '" placeholder="Tu respuesta..." onchange="missionAll[' + qi + '].sel=parseFloat(this.value)"></div>';
+    } else {
+      if (p.svg) html += p.svg;
+      html += '<h3>' + p.q + '</h3><div class="options">';
+      var optPairs = p.opts.map(function(o,i){return{text:o,idx:i}});
+      shuffle(optPairs);
+      p._shuffled = optPairs;
+      optPairs.forEach(function(op) {
+        html += '<button class="option" onclick="missionSelect(' + qi + ',' + op.idx + ',this)" data-oidx="' + op.idx + '">' + op.text + '</button>';
+      });
+      html += '</div>';
+    }
+    html += '<div class="feedback-box" id="mfb' + qi + '"></div>';
+    html += '</div>';
+  });
+  area.innerHTML = html;
+}
+
+function missionSelect(qi, oidx, el) {
+  var card = document.getElementById('mq' + qi);
+  card.querySelectorAll('.option').forEach(function(o){o.classList.remove('selected')});
+  el.classList.add('selected');
+  missionAll[qi].sel = oidx;
+}
+
+function checkMission() {
+  // Check for unanswered
+  var unanswered = [];
+  missionAll.forEach(function(item, qi) {
+    if (item.sel === null) {
+      var inp = document.getElementById('minp' + qi);
+      if (inp && inp.value !== '') { item.sel = parseFloat(inp.value); }
+      else { unanswered.push(qi + 1); }
+    }
+  });
+  if (unanswered.length > 0) {
+    alert('Te faltan preguntas por contestar: ' + unanswered.join(', '));
+    return;
+  }
+
+  // Disable everything
+  document.querySelectorAll('#screen-mission .option').forEach(function(o){ o.disabled = true; o.style.cursor = 'default'; });
+  document.querySelectorAll('#screen-mission .input-num').forEach(function(o){ o.disabled = true; });
+  document.getElementById('mission-check-btn').style.display = 'none';
+
+  var score = 0;
+  var bossOk = false;
+  missionAll.forEach(function(item, qi) {
+    var p = item.prob;
+    var fb = document.getElementById('mfb' + qi);
+    var ok = false;
+    if (p.inputType === 'number') {
+      ok = (item.sel === p.respuesta);
+      var inp = document.getElementById('minp' + qi);
+      if (ok) { inp.classList.add('correct'); }
+      else { inp.classList.add('wrong'); }
+    } else {
+      ok = (item.sel === p.c);
+      var card = document.getElementById('mq' + qi);
+      card.querySelectorAll('.option').forEach(function(o) {
+        var oi = parseInt(o.getAttribute('data-oidx'));
+        if (oi === p.c) o.classList.add('correct');
+        if (oi === item.sel && !ok) o.classList.add('wrong');
+      });
+    }
+    if (ok) {
+      score++;
+      fb.className = 'feedback-box show fb-ok';
+      fb.textContent = '\u2705 Oso ondo!';
+      if (item.phase === 'A') prog.puntos += 10;
+      else if (item.phase === 'B') prog.puntos += 25;
+      else { prog.puntos += 100; bossOk = true; }
+    } else {
+      fb.className = 'feedback-box show fb-fail';
+      var correctAnswer = p.inputType === 'number' ? p.respuesta : p.opts[p.c];
+      fb.innerHTML = '\u274C Respuesta correcta: ' + correctAnswer + (p.ex ? '<br>' + p.ex : '');
+    }
+  });
+
+  if (bossOk) earnMedal('jefe1');
+
+  // Update streak
+  var today = new Date().toISOString().slice(0,10);
+  if (prog.lastDay !== today) {
+    var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+    prog.racha = (prog.lastDay === yesterday) ? prog.racha + 1 : 1;
+    prog.lastDay = today;
+  }
+  prog.totalMisiones++;
+  // Weekly tracking
+  var wk = getWeekId();
+  if (prog.semana !== wk) { prog.semana = wk; prog.retosSemana = 0; prog.simSemana = 0; }
+  prog.retosSemana = (prog.retosSemana || 0) + 1;
+
+  var total = missionAll.length;
+  var nota = Math.round((score / total) * 100) / 10;
+
+  // Track retos con nota >= 7 para desbloquear simulacro
+  if (nota >= 7) {
+    if (!prog.retosNotables) prog.retosNotables = 0;
+    prog.retosNotables++;
+  }
+
+  // Subir/bajar nivel
+  if (!prog.nivel) prog.nivel = 1;
+  if (!prog.rachaNotable) prog.rachaNotable = 0;
+  if (!prog.rachaSuspenso) prog.rachaSuspenso = 0;
+  var nivelAntes = prog.nivel;
+  if (nota >= 7) {
+    prog.rachaNotable++;
+    prog.rachaSuspenso = 0;
+    if (prog.rachaNotable >= 3 && prog.nivel < 5) {
+      prog.nivel++;
+      prog.rachaNotable = 0;
+    }
+  } else if (nota < 5) {
+    prog.rachaSuspenso++;
+    prog.rachaNotable = 0;
+    if (prog.rachaSuspenso >= 2 && prog.nivel > 1) {
+      prog.nivel--;
+      prog.rachaSuspenso = 0;
+    }
+  } else {
+    // Nota 5-6.9: ni sube ni baja, reset rachas
+    prog.rachaNotable = 0;
+    prog.rachaSuspenso = 0;
+  }
+  var subioNivel = prog.nivel > nivelAntes;
+  var bajoNivel = prog.nivel < nivelAntes;
+
+  checkAutoMedals();
+  saveProgress(prog);
+
+  // Show result at bottom
+  var pct = Math.round((score / total) * 100);
+  var cal = getCal(nota);
+  var nivelMsg = '';
+  if (subioNivel) nivelMsg = '<p style="color:#38ef7d;font-size:1.2em;font-weight:bold;margin-top:12px">&#11014;&#65039; ¡Has subido al Nivel ' + prog.nivel + '! Los retos serán más difíciles.</p>';
+  else if (bajoNivel) nivelMsg = '<p style="color:#ff6b6b;font-size:1.1em;margin-top:12px">&#11015;&#65039; Has bajado al Nivel ' + prog.nivel + '. ¡Tú puedes!</p>';
+  else if (nota >= 7 && prog.nivel < 5) nivelMsg = '<p style="color:#aaa;margin-top:8px">&#127947; Nivel ' + prog.nivel + ' · Racha para subir: ' + prog.rachaNotable + '/3</p>';
+
+  var rhtml = '<div class="result-box" style="margin-top:25px">';
+  rhtml += '<h2 style="color:#f9d423;margin-bottom:10px">&#129409; ¡Misión completada!</h2>';
+  rhtml += '<div class="big-score" style="color:' + cal.color + '">' + score + ' / ' + total + '</div>';
+  rhtml += '<p style="color:#aaa">Porcentaje: ' + pct + '%</p>';
+  rhtml += '<div style="font-size:2.5em;margin:10px 0">' + cal.icon + '</div>';
+  rhtml += '<div style="font-size:1.4em;font-weight:bold;margin:5px 0;color:' + cal.color + '">Nota: ' + nota.toFixed(1) + ' / 10</div>';
+  rhtml += '<div class="cal-badge" style="background:' + cal.color + '">' + cal.label.toUpperCase() + '</div>';
+  rhtml += nivelMsg;
+  rhtml += '<p style="color:#aaa;margin-top:12px">&#128293; Racha: ' + prog.racha + ' día(s) · &#11088; Puntos totales: ' + prog.puntos + '</p>';
+  rhtml += '<div style="margin-top:20px"><button class="btn-home" onclick="goHome()">&#127968; Volver al inicio</button></div>';
+  rhtml += '</div>';
+  document.getElementById('mission-area').innerHTML += rhtml;
+
+  // Scroll to result
+  var resultEl = document.querySelector('#mission-area .result-box');
+  if (resultEl) resultEl.scrollIntoView({ behavior:'smooth', block:'center' });
+  if (pct >= 70) showConfetti();
+}
+
+function getCal(nota) {
+  if (nota >= 9)  return { label:'Sobresaliente', icon:'&#127942;', color:'#38ef7d' };
+  if (nota >= 7)  return { label:'Notable',       icon:'&#128079;', color:'#6495ed' };
+  if (nota >= 6)  return { label:'Bien',           icon:'&#128077;', color:'#f9d423' };
+  if (nota >= 5)  return { label:'Suficiente',     icon:'&#128214;', color:'#e67e22' };
+  return           { label:'Suspenso',      icon:'&#128170;', color:'#ff4e50' };
+}
+
+// ===== SIMULACRO =====
+var simProblems, simSelections, simTimer, simSeconds;
+
+function startSimulacro() {
+  var rn = prog.retosNotables || 0;
+  if (rn < 3) { alert('Necesitas completar 3 retos con nota ≥ 7 antes de hacer el Simulacro. Llevas ' + rn + '/3.'); return; }
+  adaptDiff = 2;
+  simProblems = [];
+  // 3 calculo, 3 logica, 3 geo, 3 problemas = 12
+  for (var i = 0; i < 3; i++) simProblems.push(genCalculo(2));
+  simProblems = simProblems.concat(getProblems('logica',2,3));
+  simProblems = simProblems.concat(getProblems('geo',2,3));
+  simProblems = simProblems.concat(getProblems('problemas',2,3));
+  shuffle(simProblems);
+  simSelections = [];
+  for (var i = 0; i < simProblems.length; i++) simSelections.push(null);
+  showScreen('screen-simulacro');
+  renderSimulacro();
+  // Timer 25 min
+  simSeconds = 25 * 60;
+  updateSimTimer();
+  simTimer = setInterval(function() {
+    simSeconds--;
+    updateSimTimer();
+    if (simSeconds <= 0) { clearInterval(simTimer); checkSimulacro(); }
+  }, 1000);
+}
+
+function updateSimTimer() {
+  var m = Math.floor(simSeconds / 60);
+  var s = simSeconds % 60;
+  document.querySelector('#sim-timer span').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function renderSimulacro() {
+  var html = '';
+  simProblems.forEach(function(p, qi) {
+    html += '<div class="problem-card" id="sq' + qi + '">';
+    html += '<div class="problem-num">' + (qi + 1) + ' / ' + simProblems.length + '</div>';
+    if (p.svg) html += p.svg;
+    html += '<h3>' + (p.enunciado || p.q) + '</h3>';
+    if (p.inputType === 'number') {
+      html += '<div class="input-row"><input class="input-num" type="number" id="sinp' + qi + '" placeholder="Tu respuesta..." onchange="simSelections[' + qi + ']=parseFloat(this.value)"></div>';
+    } else {
+      html += '<div class="options">';
+      var optPairs = p.opts.map(function(o,i){return{text:o,idx:i}});
+      shuffle(optPairs);
+      // Store shuffled order
+      p._shuffled = optPairs;
+      optPairs.forEach(function(op) {
+        html += '<button class="option" onclick="simSelect(' + qi + ',' + op.idx + ',this)" data-oidx="' + op.idx + '">' + op.text + '</button>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  document.getElementById('sim-area').innerHTML = html;
+}
+
+function simSelect(qi, oidx, el) {
+  var card = document.getElementById('sq' + qi);
+  card.querySelectorAll('.option').forEach(function(o){o.classList.remove('selected')});
+  el.classList.add('selected');
+  simSelections[qi] = oidx;
+}
+
+function checkSimulacro() {
+  if (simTimer) { clearInterval(simTimer); simTimer = null; }
+  var score = 0;
+  var review = [];
+  simProblems.forEach(function(p, qi) {
+    var sel = simSelections[qi];
+    var correct, ok, userAnswer, correctAnswer;
+    if (p.inputType === 'number') {
+      correct = p.respuesta;
+      ok = (sel === correct);
+      userAnswer = (sel !== null) ? sel : 'Sin respuesta';
+      correctAnswer = correct;
+    } else {
+      correct = p.c;
+      ok = (sel === correct);
+      userAnswer = (sel !== null) ? p.opts[sel] : 'Sin respuesta';
+      correctAnswer = p.opts[correct];
+    }
+    if (ok) score++;
+    review.push({ q: p.enunciado || p.q, ok: ok, userAnswer: userAnswer, correctAnswer: correctAnswer, ex: p.ex || '', svg: p.svg || '' });
+  });
+  var total = simProblems.length;
+  var nota = Math.round((score / total) * 100) / 10;
+  var pct = Math.round((score / total) * 100);
+  var cal = getCal(nota);
+
+  if (pct >= 70) { earnMedal('sim1'); prog.puntos += 200; }
+  if (pct === 100) earnMedal('sim100');
+  if (nota > prog.mejorSimulacro) prog.mejorSimulacro = nota;
+  // Weekly tracking
+  var wk = getWeekId();
+  if (prog.semana !== wk) { prog.semana = wk; prog.retosSemana = 0; prog.simSemana = 0; }
+  prog.simSemana = (prog.simSemana || 0) + 1;
+  checkAutoMedals();
+  saveProgress(prog);
+
+  // Results
+  var html = '<div class="result-box">';
+  html += '<h2 style="color:#f9d423">&#127919; Simulacro completado</h2>';
+  html += '<div class="big-score" style="color:' + cal.color + '">' + score + ' / ' + total + '</div>';
+  html += '<p style="color:#aaa">Porcentaje: ' + pct + '%</p>';
+  html += '<div style="font-size:2.5em;margin:10px 0">' + cal.icon + '</div>';
+  html += '<div style="font-size:1.4em;font-weight:bold;margin:5px 0;color:' + cal.color + '">Nota: ' + nota.toFixed(1) + ' / 10</div>';
+  html += '<div class="cal-badge" style="background:' + cal.color + '">' + cal.label.toUpperCase() + '</div>';
+  if (pct >= 70) html += '<p style="color:#38ef7d;margin-top:10px">&#127942; ¡Simulacro superado! +200 puntos</p>';
+  html += '</div>';
+  document.getElementById('sim-results-area').innerHTML = html;
+
+  // Review
+  var rhtml = '<h3 style="color:#aaa;margin:20px 0 15px">&#128270; Revisión problema a problema</h3>';
+  review.forEach(function(r, i) {
+    rhtml += '<div class="review-card ' + (r.ok ? 'rev-ok' : 'rev-fail') + '">';
+    rhtml += '<h4>' + (i+1) + '. ' + r.q + '</h4>';
+    if (r.svg) rhtml += r.svg;
+    rhtml += '<p>Tu respuesta: <span class="review-answer ' + (r.ok ? 'rev-correct' : 'rev-wrong') + '">' + r.userAnswer + '</span>';
+    if (!r.ok) rhtml += ' · Correcta: <span class="rev-correct">' + r.correctAnswer + '</span>';
+    rhtml += '</p>';
+    if (r.ex) rhtml += '<p style="color:#aaa;margin-top:4px">' + r.ex + '</p>';
+    rhtml += '</div>';
+  });
+  document.getElementById('sim-review-area').innerHTML = rhtml;
+  showScreen('screen-sim-results');
+  if (pct >= 70) showConfetti();
+}
+
+// ===== EFFECTS =====
+function showConfetti() {
+  var c = document.createElement('div');
+  c.className = 'confetti-container';
+  var colors = ['#f9d423','#ff4e50','#38ef7d','#6495ed','#ff6b6b','#ffd93d'];
+  for (var i = 0; i < 40; i++) {
+    var p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = rnd(5,95) + '%';
+    p.style.animationDelay = (rnd(0,20)/10) + 's';
+    p.style.background = colors[rnd(0,colors.length-1)];
+    p.style.borderRadius = rnd(0,1) ? '50%' : '2px';
+    p.style.width = rnd(6,12) + 'px';
+    p.style.height = rnd(6,12) + 'px';
+    c.appendChild(p);
+  }
+  document.body.appendChild(c);
+  setTimeout(function(){c.remove()},3500);
+}
+
+function shakeEl(el) {
+  if (!el) return;
+  el.classList.add('shake');
+  setTimeout(function(){el.classList.remove('shake')},500);
+}
+
+// ===== INIT =====
+goHome();
+</script>
+</body>
+</html>

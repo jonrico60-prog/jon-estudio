@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ikasi - Zirkulazioa eta Arnas Aparatua</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh; padding: 20px;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+  .header { text-align: center; color: white; padding: 20px 0; }
+  .header h1 { font-size: 1.8em; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+  .header p { opacity: 0.9; margin-top: 5px; }
+  .btn-back {
+    display: inline-flex; align-items: center; gap: 6px; color: white;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 0.95em;
+    font-family: inherit; transition: all 0.2s; margin-bottom: 18px; text-decoration: none;
+  }
+  .btn-back:hover { background: rgba(255,255,255,0.3); }
+  .tabs {
+    display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;
+  }
+  .tab {
+    padding: 10px 20px; border-radius: 10px; cursor: pointer; font-size: 1em;
+    font-family: inherit; border: 2px solid rgba(255,255,255,0.3); color: white;
+    background: rgba(255,255,255,0.1); transition: all 0.2s;
+  }
+  .tab:hover { background: rgba(255,255,255,0.2); }
+  .tab.active { background: white; color: #2c3e50; border-color: white; font-weight: bold; }
+  .card {
+    background: white; border-radius: 16px; padding: 28px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15); margin-bottom: 20px;
+  }
+  .card h2 { color: #8e44ad; font-size: 1.4em; margin-bottom: 15px; border-bottom: 3px solid #8e44ad; padding-bottom: 8px; }
+  .card h3 { color: #2c3e50; font-size: 1.15em; margin: 18px 0 8px; }
+  .card p, .card li { color: #555; line-height: 1.7; font-size: 1em; }
+  .card ul { padding-left: 20px; margin: 8px 0; }
+  .card li { margin-bottom: 6px; }
+  .highlight { background: #f0e6ff; padding: 2px 6px; border-radius: 4px; font-weight: 600; color: #6c3483; }
+  .info-box {
+    background: #eaf4fe; border-left: 4px solid #3498db; padding: 12px 16px;
+    border-radius: 0 8px 8px 0; margin: 12px 0;
+  }
+  .info-box strong { color: #2980b9; }
+  .warning-box {
+    background: #fef9e7; border-left: 4px solid #f39c12; padding: 12px 16px;
+    border-radius: 0 8px 8px 0; margin: 12px 0;
+  }
+  .section { display: none; }
+  .section.active { display: block; }
+  /* Flashcards */
+  .flashcard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 15px; }
+  .flashcard {
+    background: linear-gradient(135deg, #f5f0ff, #eee5ff); border-radius: 12px;
+    padding: 18px; cursor: pointer; transition: all 0.3s; min-height: 100px;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    border: 2px solid #d5c5f0; position: relative;
+  }
+  .flashcard:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
+  .flashcard.flipped { background: linear-gradient(135deg, #e8f8f5, #d5f5e3); border-color: #82e0aa; }
+  .flashcard .front { font-weight: bold; color: #6c3483; font-size: 1.05em; }
+  .flashcard .back { display: none; color: #1e8449; font-size: 0.95em; line-height: 1.5; }
+  .flashcard.flipped .front { display: none; }
+  .flashcard.flipped .back { display: block; }
+  .flashcard-hint { font-size: 0.8em; color: #aaa; text-align: center; margin-top: 10px; }
+  .diagram-label {
+    display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85em;
+    font-weight: 600; margin: 3px;
+  }
+  .label-red { background: #fadbd8; color: #c0392b; }
+  .label-blue { background: #d6eaf8; color: #2471a3; }
+  .label-green { background: #d5f5e3; color: #1e8449; }
+  .label-purple { background: #e8daef; color: #6c3483; }
+  .step-list { counter-reset: steps; list-style: none; padding: 0; }
+  .step-list li {
+    counter-increment: steps; padding: 12px 15px 12px 55px; position: relative;
+    margin-bottom: 10px; background: #fafafa; border-radius: 10px; border-left: 3px solid #8e44ad;
+  }
+  .step-list li::before {
+    content: counter(steps); position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    width: 30px; height: 30px; background: #8e44ad; color: white; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9em;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="btn-back" href="../portal.html">&#8592; Atzera / Volver</a>
+  <div class="header">
+    <h1>&#127891; Zirkulazioa eta Arnas Aparatua</h1>
+    <p>Ikasi - Apuntes y resumen interactivo</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showSection('zirkulazioa')">&#10084;&#65039; Zirkulazioa</button>
+    <button class="tab" onclick="showSection('bihotza')">&#129728; Bihotza</button>
+    <button class="tab" onclick="showSection('odola')">&#128684; Nola zirkulatzen du?</button>
+    <button class="tab" onclick="showSection('arnasa')">&#127786; Arnas Aparatua</button>
+    <button class="tab" onclick="showSection('flashcards')">&#127183; Flashcards</button>
+  </div>
+
+  <!-- ZIRKULAZIOA APARATUA -->
+  <div id="zirkulazioa" class="section active">
+    <div class="card">
+      <h2>&#10084;&#65039; Zirkulazioa Aparatua</h2>
+      <p>Zirkulazio-aparatua <span class="highlight">substantziak organismoan zehar eramateaz</span> arduratzen den gorputz atala da; <strong>odol-zirkulazioaren bidez</strong> egiten du hori.</p>
+
+      <h3>&#128308; Odola</h3>
+      <p>Odola zirkulazio-aparatua betetzen duen <span class="highlight">likido gorria</span> da. Haren funtzioak:</p>
+      <ul>
+        <li><strong>Oxigenoa</strong> garraiatu</li>
+        <li><strong>Mantenugaiak</strong> (nutrienteak) eraman</li>
+        <li><strong>Hondakinak</strong> bildu eta atera</li>
+      </ul>
+
+      <h3>&#128481; Odol-hodiak</h3>
+      <p>Odolak "odol-hodi" izeneko tutuetaik zirkulatzen du. Hiru motatakoak izan daitezke:</p>
+      <div class="info-box">
+        <p><span class="diagram-label label-red">ARTERIAK</span> Bihotzetik organoetara eramaten dute odola.</p>
+        <p style="margin-top:8px"><span class="diagram-label label-blue">ZAINAK</span> Organoetatik bihotzera eramaten dute odola.</p>
+        <p style="margin-top:8px"><span class="diagram-label label-purple">KAPILARRAK</span> Arterien eta zainen adarkadurarik meheenak dira.</p>
+      </div>
+
+      <div class="warning-box">
+        <strong>&#128161; Gogoratu:</strong> <strong>Arteriak = bihotzetik KANPORA</strong> / <strong>Zainak = bihotzera BARRURA</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- BIHOTZA -->
+  <div id="bihotza" class="section">
+    <div class="card">
+      <h2>&#129728; Bihotza</h2>
+      <p>Bihotza organo <span class="highlight">hutsa</span> da barrutik. <strong>Lau barrunbe</strong> eta <strong>muskuluzko hormak</strong> ditu.</p>
+      <p>Odola hodietan zehar <span class="highlight">bultzatzeaz</span> arduratzen da.</p>
+
+      <h3>&#128147; Bihotzaren mugimendua: Taupadak</h3>
+      <p>Bihotzak bi mugimendu egiten ditu:</p>
+      <div class="info-box">
+        <p>1. <strong>ZABALDU</strong> &#8594; Odola barrunbeetan sartzen da (odola jasotzen du)</p>
+        <p style="margin-top:8px">2. <strong>UZKURTU</strong> &#8594; Odola hodietara irteten da (odola kanpora bidaltzen du)</p>
+      </div>
+
+      <h3>Bihotzaren atalak</h3>
+      <p>
+        <span class="diagram-label label-red">Arteriak</span>
+        <span class="diagram-label label-blue">Zainak</span>
+        <span class="diagram-label label-green">Barrunbeak (4)</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- NOLA ZIRKULATZEN DU ODOLAK -->
+  <div id="odola" class="section">
+    <div class="card">
+      <h2>&#128684; Nola zirkulatzen du odolak?</h2>
+      <p>Zirkulazio-aparatuan, bihotzak odol-hodietan zehar bultzatzen du odola, substantziak gorputz guztira banatzeko eta kanporatze tokiraino eramateko.</p>
+
+      <ol class="step-list">
+        <li>
+          <strong>Odola bihotzetik ateratzen da</strong><br>
+          Bihotzak, hormak uzkurtuz, <span class="highlight">arterietara</span> bultzatzen du odola; arteriek organoetara eramaten dute.
+        </li>
+        <li>
+          <strong>Odola organoetara heltzen da</strong><br>
+          Organoetan, odola kapilarretan zehar doa eta funtzio batzuk betetzen ditu:
+          <ul style="margin-top:8px">
+            <li><strong>Birikietako albeoloetan (2a):</strong> oxigenoa hartu eta karbono dioxidoa askatu</li>
+            <li><strong>Hestean (2b):</strong> elikagaien digestioan lortutako mantenugaiak jasotzen</li>
+            <li><strong>Organo guztietan (2c):</strong> oxigenoa eta mantenugaiak uzten, hondakinak batzen</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Odola bihotzera itzultzen da</strong><br>
+          Lan horiek egin ondoren, odola bihotzera itzultzen da, <span class="highlight">kapilarretatik</span> lehenengo eta <span class="highlight">zainetatik</span> gero.
+        </li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ARNAS APARATUA -->
+  <div id="arnasa" class="section">
+    <div class="card">
+      <h2>&#127786; Arnas Aparatua</h2>
+      <p>Arnas aparatua airetik behar dugun <span class="highlight">oxigenoa hartzen</span> eta hondakina (<span class="highlight">karbono dioxidoa</span>) kanporatzen duen gorputz atala da.</p>
+
+      <h3>Arnasbideak</h3>
+      <ul>
+        <li><strong>AHOA eta SUDUR-HOBIAK:</strong> sudur-barrunbea osatzen dute sudurraren barruan, eta bi sudur-zuloen bidez komunikatzen dira kanpoaldearekin.</li>
+        <li><strong>FARINGEA, LARINGEA eta TRAKEA:</strong> sudur-barruneetan hasi, lepoaren barrutik igaro eta bularraldean sartzen dira.</li>
+        <li><strong>BRONKIOAK:</strong> trakea bi hoditan banatzen da, eta horiek dira bronkioak. Milaka hodi meheagotan banatzen dira birikien barruan, eta horietako bakoitza albeolo batean bukatzen da.</li>
+        <li><strong>ALBEOLOAK:</strong> zaku ñimiñoak dira, odol-hodi mehez inguratuak.</li>
+      </ul>
+
+      <h3>&#127748; Birikak</h3>
+      <div class="info-box">
+        <p>Birikak <strong>belaki (esponja)</strong> baten antzeko bi organo dira; barruan bronkioen adarrak eta albeoloak dituzte.</p>
+      </div>
+
+      <h3>Arnasbideen ordena</h3>
+      <p style="text-align:center; font-size:1.1em; margin-top:10px;">
+        <span class="diagram-label label-red">Sudurra/Ahoa</span>
+        &#8594;
+        <span class="diagram-label label-blue">Faringea</span>
+        &#8594;
+        <span class="diagram-label label-purple">Laringea</span>
+        &#8594;
+        <span class="diagram-label label-green">Trakea</span>
+        &#8594;
+        <span class="diagram-label label-red">Bronkioak</span>
+        &#8594;
+        <span class="diagram-label label-blue">Albeoloak</span>
+      </p>
+
+      <div class="warning-box">
+        <strong>&#128218; Hiztegia:</strong> Belaki = esponja / Ñimiño = oso txikia
+      </div>
+    </div>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div id="flashcards" class="section">
+    <div class="card">
+      <h2>&#127183; Flashcards - Klik egin irabiatzeko!</h2>
+      <div class="flashcard-grid">
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer da zirkulazio-aparatua?</div>
+          <div class="back">Substantziak organismoan zehar eramateaz arduratzen den gorputz atala da, odol-zirkulazioaren bidez.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer da odola?</div>
+          <div class="back">Likido gorria da. Oxigenoa, mantenugaiak eta hondakinak garraiatzea du funtzioa.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer dira ARTERIAK?</div>
+          <div class="back">Bihotzetik organoetara odola eramaten duten odol-hodiak.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer dira ZAINAK?</div>
+          <div class="back">Organoetatik bihotzera odola eramaten duten odol-hodiak.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer dira KAPILARRAK?</div>
+          <div class="back">Arterien eta zainen adarkadurarik meheenak dira.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zenbat barrunbe ditu bihotzak?</div>
+          <div class="back">Lau (4) barrunbe ditu.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Bihotzak zer bi mugimendu egiten ditu?</div>
+          <div class="back">ZABALDU (odola sartzeko) eta UZKURTU (odola kanpora bidali).</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer da arnas aparatua?</div>
+          <div class="back">Oxigenoa hartzen eta karbono dioxidoa kanporatzen duen gorputz atala.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zein dira arnasbideak (ordenan)?</div>
+          <div class="back">Sudurra/Ahoa &#8594; Faringea &#8594; Laringea &#8594; Trakea &#8594; Bronkioak &#8594; Albeoloak</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer dira BRONKIOAK?</div>
+          <div class="back">Trakea bi hoditan banatzen denean sortzen diren hodiak. Birikien barruan meheagotan banatzen dira.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer dira ALBEOLOAK?</div>
+          <div class="back">Zaku ñimiñoak (oso txikiak) dira, odol-hodi mehez inguratuak. Bertan oxigenoa eta CO2 trukatzen dira.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer dira BIRIKAK?</div>
+          <div class="back">Belaki (esponja) baten antzeko bi organo. Barruan bronkioen adarrak eta albeoloak dituzte.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Odola nola itzultzen da bihotzera?</div>
+          <div class="back">Kapilarretatik lehenengo eta zainetatik gero.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer gertatzen da birikietako albeoloetan?</div>
+          <div class="back">Oxigenoa hartu eta karbono dioxidoa askatzen da.</div>
+        </div>
+      </div>
+      <p class="flashcard-hint">&#128070; Klik egin txartel bakoitzean erantzuna ikusteko</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
