@@ -1262,28 +1262,27 @@ function setupRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return null;
   const r = new SR();
-  // continuous=false hace cada utterance mas rapida (menos retraso)
-  // El onend reinicia automaticamente para seguir escuchando
-  r.continuous = false;
-  r.interimResults = false;
+  // continuous=true: la sesion se queda activa entre letras, sin reinicios que metan retraso.
+  r.continuous = true;
+  // interimResults=true: el motor envia hipotesis tempranas; procesamos solo las "finales"
+  // pero mantener la conexion "caliente" reduce latencia perceptiva.
+  r.interimResults = true;
   r.lang = 'en-US';
   // maxAlternatives=1: SOLO la mejor alternativa.
   // Antes se escogia la "que mas letras tuviera", lo que duplicaba letras
   // (ej: dices "B" -> motor sugeria "be be" -> escribia "BB").
   r.maxAlternatives = 1;
-  // Anti-doble-procesado: cada resultado tiene un timestamp; si llega el mismo en menos de 200ms, se ignora.
-  let lastProcessedTs = 0;
   r.onresult = (e) => {
-    const now = Date.now();
-    if (now - lastProcessedTs < 200) return;
-    lastProcessedTs = now;
     for (let i = e.resultIndex; i < e.results.length; i++) {
+      // Solo procesamos cuando el motor da el resultado como "final"
+      // (los interim son hipotesis intermedias, no las queremos para no duplicar).
+      if (!e.results[i].isFinal) continue;
       const transcript = e.results[i][0].transcript;
       processDictation(transcript);
     }
   };
   r.onend = () => {
-    // Reiniciar si seguimos en modo escucha (continuous=false termina tras cada utterance)
+    // Si la sesion se cae sola (timeout, silencio largo) y seguimos escuchando, reiniciar.
     if (listening) {
       try { r.start(); } catch(e) {}
     }
