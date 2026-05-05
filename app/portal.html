@@ -416,4 +416,31 @@ function renderExerciseCard(item, color) {
   if (item.dataEx) h += ' data-exercise="' + item.dataEx + '"';
   h += '><span class="card-badge ' + item.badgeClass + '">' + item.badge + '</span>';
   h += '<h3>' + item.title + '</h3><p>' + item.desc + '</p>';
-  if (item.dataEx) h += '<div class
+  if (item.dataEx) h += '<div class="card-history"></div>';
+  h += '</a>';
+  return h;
+}
+
+function renderCardHistories() {
+  var history = getHistory();
+  var byEx = {};
+  history.forEach(function(e) { if (!byEx[e.ejercicio]) byEx[e.ejercicio] = []; byEx[e.ejercicio].push(e); });
+  document.querySelectorAll('[data-exercise]').forEach(function(card) {
+    var name = card.getAttribute('data-exercise');
+    var hd = card.querySelector('.card-history');
+    if (!hd) return;
+    var att = byEx[name];
+    if (!att || att.length === 0) { hd.innerHTML = '<div class="card-no-history">Sin intentar</div>'; return; }
+    var h = '<div class="card-history-title">Ultimos intentos:</div>';
+    att.slice(0,3).forEach(function(a) {
+      var m = getMedal(a.nota);
+      h += '<div class="card-history-row"><span class="medal">' + m.icon + '</span><span class="nota" style="color:' + m.color + '">' + a.nota + '/10</span><span class="fecha">' + a.fecha + '</span></div>';
+    });
+    hd.innerHTML = h;
+  });
+}
+
+goSubjects();
+</script>
+</body>
+</html>
