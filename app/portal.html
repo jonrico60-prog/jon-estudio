@@ -249,13 +249,18 @@ var SITE = [
       { name: '3. Ebaluazioa', exams: [
         { name: '1. Azterketa',
           study: [
-            { title: 'Zirkulazioa eta Arnas Aparatua - Apunteak', href: 'Gizarte/ikasi_zirkulazioa_arnas.html', desc: 'Zirkulazio eta arnas aparatuen laburpena, flashcard-ekin', badge: 'Ikasi', badgeClass: 'badge-study', dataEx: '' }
+            { title: 'Zirkulazioa eta Arnas Aparatua - Apunteak', href: 'Gizarte/ikasi_zirkulazioa_arnas.html', desc: 'Zirkulazioa, bihotza, arnasa eta nola hartzen dugun arnasa - flashcardekin', badge: 'Ikasi', badgeClass: 'badge-study', dataEx: '' },
+            { title: 'Digestio eta Lokomozio Aparatua - Apunteak', href: 'Gizarte/ikasi_digestio_lokomozio.html', desc: 'Digestioa (3 fase), hezurrak, giharrak eta giltzadurak - flashcardekin', badge: 'Ikasi', badgeClass: 'badge-study', dataEx: '' }
           ],
           practice: [
             { title: 'Zirkulazioa Aparatua - Quiz', href: 'Gizarte/zirkulazioa_quiz.html', desc: '15 galdera - Odola, bihotza, arteriak, zainak...', badge: 'Test', badgeClass: 'badge-easy', dataEx: 'Gizarte - Zirkulazioa Aparatua Quiz' },
-            { title: 'Arnas Aparatua - Quiz', href: 'Gizarte/arnas_aparatua_quiz.html', desc: '12 galdera - Birikak, bronkioak, albeoloak...', badge: 'Test', badgeClass: 'badge-medium', dataEx: 'Gizarte - Arnas Aparatua Quiz' }
+            { title: 'Arnas Aparatua - Quiz', href: 'Gizarte/arnas_aparatua_quiz.html', desc: '12 galdera - Birikak, bronkioak, albeoloak...', badge: 'Test', badgeClass: 'badge-medium', dataEx: 'Gizarte - Arnas Aparatua Quiz' },
+            { title: 'Digestio Aparatua - Quiz', href: 'Gizarte/digestio_aparatua_quiz.html', desc: '15 galdera - Ahoa, urdaila, hesteak, faseak...', badge: 'Test', badgeClass: 'badge-easy', dataEx: 'Gizarte - Digestio Aparatua Quiz' },
+            { title: 'Lokomozio Aparatua - Quiz', href: 'Gizarte/lokomozio_aparatua_quiz.html', desc: '15 galdera - Hezurrak, giharrak, giltzadurak...', badge: 'Test', badgeClass: 'badge-medium', dataEx: 'Gizarte - Lokomozio Aparatua Quiz' }
           ],
-          exam: []
+          exam: [
+            { title: 'Azterketa Orokorra - 4 Aparatuak', href: 'Gizarte/azterketa_orokorra.html', desc: '25 galdera - Aparatu guztiak nahastuta, pistarik gabe', badge: 'Azterketa', badgeClass: 'badge-fill', dataEx: 'Gizarte - Azterketa Orokorra' }
+          ]
         },
         { name: '2. Azterketa', study: [], practice: [], exam: [] }
       ]}
@@ -411,31 +416,4 @@ function renderExerciseCard(item, color) {
   if (item.dataEx) h += ' data-exercise="' + item.dataEx + '"';
   h += '><span class="card-badge ' + item.badgeClass + '">' + item.badge + '</span>';
   h += '<h3>' + item.title + '</h3><p>' + item.desc + '</p>';
-  if (item.dataEx) h += '<div class="card-history"></div>';
-  h += '</a>';
-  return h;
-}
-
-function renderCardHistories() {
-  var history = getHistory();
-  var byEx = {};
-  history.forEach(function(e) { if (!byEx[e.ejercicio]) byEx[e.ejercicio] = []; byEx[e.ejercicio].push(e); });
-  document.querySelectorAll('[data-exercise]').forEach(function(card) {
-    var name = card.getAttribute('data-exercise');
-    var hd = card.querySelector('.card-history');
-    if (!hd) return;
-    var att = byEx[name];
-    if (!att || att.length === 0) { hd.innerHTML = '<div class="card-no-history">Sin intentar</div>'; return; }
-    var h = '<div class="card-history-title">Ultimos intentos:</div>';
-    att.slice(0,3).forEach(function(a) {
-      var m = getMedal(a.nota);
-      h += '<div class="card-history-row"><span class="medal">' + m.icon + '</span><span class="nota" style="color:' + m.color + '">' + a.nota + '/10</span><span class="fecha">' + a.fecha + '</span></div>';
-    });
-    hd.innerHTML = h;
-  });
-}
-
-goSubjects();
-</script>
-</body>
-</html>
+  if (item.dataEx) h += '<div class

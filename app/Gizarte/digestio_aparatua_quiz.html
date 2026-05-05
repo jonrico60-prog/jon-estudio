@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz - Digestio Aparatua</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh; padding: 20px;
+  }
+  .container { max-width: 750px; margin: 0 auto; }
+  .header { text-align: center; color: white; padding: 20px 0; }
+  .header h1 { font-size: 1.8em; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+  .header p { opacity: 0.9; margin-top: 5px; }
+  .btn-back {
+    display: inline-flex; align-items: center; gap: 6px; color: white;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 0.95em;
+    font-family: inherit; transition: all 0.2s; margin-bottom: 18px; text-decoration: none;
+  }
+  .btn-back:hover { background: rgba(255,255,255,0.3); }
+  .question-card {
+    background: white; border-radius: 16px; padding: 24px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 15px;
+  }
+  .question-card h3 { color: #2c3e50; font-size: 1.1em; margin-bottom: 14px; line-height: 1.5; }
+  .question-num { color: #8e44ad; font-size: 0.85em; font-weight: bold; margin-bottom: 8px; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option {
+    padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px;
+    cursor: pointer; transition: all 0.2s; font-size: 1em; font-family: inherit;
+    background: white; text-align: left; color: #333;
+  }
+  .option:hover { border-color: #667eea; background: #f0f2ff; }
+  .option.selected { border-color: #667eea; background: #e8ecff; font-weight: 600; }
+  .option.correct { border-color: #27ae60; background: #d4edda; color: #155724; }
+  .option.wrong { border-color: #e74c3c; background: #f8d7da; color: #721c24; }
+  .option.missed { border-color: #27ae60; background: #d4edda; color: #155724; opacity: 0.7; }
+  .option:disabled { cursor: default; }
+  .feedback {
+    margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-size: 0.9em; display: none;
+  }
+  .feedback.show-correct { background: #d4edda; color: #155724; display: block; }
+  .feedback.show-wrong { background: #f8d7da; color: #721c24; display: block; }
+  .btn-check {
+    margin-top: 25px; margin-bottom: 20px; padding: 16px 40px; background: #8e44ad; color: white;
+    border: none; border-radius: 12px; font-size: 1.2em; cursor: pointer;
+    font-family: inherit; transition: all 0.2s; display: block; width: 100%;
+    font-weight: bold;
+  }
+  .btn-check:hover { background: #7d3c98; transform: translateY(-2px); }
+  #result { display: none; text-align: center; }
+  .result-card {
+    background: white; border-radius: 16px; padding: 30px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  }
+  .btn-retry {
+    margin-top: 15px; padding: 12px 30px; background: #8e44ad; color: white;
+    border: none; border-radius: 10px; font-size: 1em; cursor: pointer;
+    font-family: inherit; margin-right: 10px;
+  }
+  .btn-retry:hover { background: #7d3c98; }
+  .btn-portal {
+    margin-top: 15px; padding: 12px 30px; background: #3498db; color: white;
+    border: none; border-radius: 10px; font-size: 1em; cursor: pointer;
+    font-family: inherit; text-decoration: none; display: inline-block;
+  }
+  .btn-portal:hover { background: #2980b9; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="btn-back" href="../portal.html">&#8592; Atzera / Volver</a>
+  <div class="header">
+    <h1>&#127869;&#65039; Digestio Aparatua - Quiz</h1>
+    <p>15 galdera - Erantzun guztiak eta gero egiaztatu!</p>
+  </div>
+  <div id="quiz-area"></div>
+  <button class="btn-check" id="btn-check" onclick="checkAll()">&#9989; Egiaztatu guztiak / Comprobar todo</button>
+  <div id="result"><div class="result-card" id="result-card"></div></div>
+</div>
+<script src="../tracker.js"></script>
+<script>
+var questions = [
+  {
+    q: "Zer da digestioa?",
+    opts: ["Arnasa hartzeko prozesua", "Janariak gorputzean egiten duen bidaia", "Odolaren zirkulazioa", "Hezurren sorrera"],
+    correct: 1
+  },
+  {
+    q: "Non hasten da digestioa?",
+    opts: ["Urdailan", "Heste meharrean", "Ahoan", "Hestegorrian"],
+    correct: 2
+  },
+  {
+    q: "Zenbat fase ditu digestioak?",
+    opts: ["Bi", "Hiru", "Lau", "Bost"],
+    correct: 1
+  },
+  {
+    q: "Zein dira digestioaren faseak ordenan?",
+    opts: ["Heste, Aho, Urdail", "Aho, Urdail, Heste", "Urdail, Aho, Heste", "Aho, Heste, Urdail"],
+    correct: 1
+  },
+  {
+    q: "Aho fasean zer prozesu gertatzen dira?",
+    opts: ["Mekanikoa eta kimikoa", "Soilik kimikoa", "Soilik mekanikoa", "Ez da ezer gertatzen"],
+    correct: 0
+  },
+  {
+    q: "Zein hodi pasatzen da ahotik urdailera?",
+    opts: ["Trakea", "Hestegorria", "Bronkioa", "Heste meharra"],
+    correct: 1
+  },
+  {
+    q: "Urdail fasean zer desegiten da?",
+    opts: ["Hezurrak", "Odola", "Proteinak eta karbohidratoak", "Albeoloak"],
+    correct: 2
+  },
+  {
+    q: "Non xurgatzen dira mantenugaiak?",
+    opts: ["Urdailan", "Heste meharrean", "Heste lodian", "Ahoan"],
+    correct: 1
+  },
+  {
+    q: "Non xurgatzen dira ura eta gatz mineralak?",
+    opts: ["Urdailan", "Heste meharrean", "Heste lodian", "Hestegorrian"],
+    correct: 2
+  },
+  {
+    q: "Nondik kanporatzen dira hondakinak?",
+    opts: ["Ahotik", "Sudurretik", "Uzkitik", "Bularraldetik"],
+    correct: 2
+  },
+  {
+    q: "Zertarako da digestioa?",
+    opts: ["Arnasa hartzeko", "Energia eskuratzeko, hazteko, mugitzeko, berotzeko", "Hezurrak indartzeko bakarrik", "Soilik bero egiteko"],
+    correct: 1
+  },
+  {
+    q: "Zein da ordena ZUZENA?",
+    opts: ["Ahoa, urdaila, hestegorria, heste meharra, heste lodia", "Ahoa, hestegorria, urdaila, heste lodia, heste meharra", "Ahoa, hestegorria, urdaila, heste meharra, heste lodia", "Ahoa, urdaila, heste meharra, hestegorria, heste lodia"],
+    correct: 2
+  },
+  {
+    q: "Zer da elikadura boloa?",
+    opts: ["Heste lodian dagoen kaka", "Ahoan txikitutako eta listuarekin nahastutako janaria", "Birikietan dagoen airea", "Bihotzeko odola"],
+    correct: 1
+  },
+  {
+    q: "Zein DA EZ digestio aparatuaren atal bat?",
+    opts: ["Urdaila", "Heste meharra", "Birika", "Hestegorria"],
+    correct: 2
+  },
+  {
+    q: "Heste fasean, dena digeritu ondoren, zer egiten dute heste meharreko odol-hodiek?",
+    opts: ["Karbono dioxidoa askatzen dute", "Mantenugaiak xurgatzen dituzte", "Ura kanporatzen dute", "Hezurrak osatzen dituzte"],
+    correct: 1
+  }
+];
+
+function shuffle(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  }
+}
+shuffle(questions);
+
+questions.forEach(function(q) {
+  var correctText = q.opts[q.correct];
+  var opts = q.opts.slice();
+  shuffle(opts);
+  q.opts = opts;
+  q.correct = opts.indexOf(correctText);
+});
+
+var selections = [];
+for (var i = 0; i < questions.length; i++) selections.push(-1);
+
+function renderAll() {
+  var html = '';
+  questions.forEach(function(q, qi) {
+    html += '<div class="question-card" id="q' + qi + '">';
+    html += '<div class="question-num">' + (qi + 1) + '. galdera</div>';
+    html += '<h3>' + q.q + '</h3><div class="options">';
+    q.opts.forEach(function(opt, oi) {
+      html += '<button class="option" onclick="selectOpt(' + qi + ',' + oi + ',this)" data-q="' + qi + '" data-o="' + oi + '">' + opt + '</button>';
+    });
+    html += '</div><div class="feedback" id="fb' + qi + '"></div></div>';
+  });
+  document.getElementById('quiz-area').innerHTML = html;
+}
+
+function selectOpt(qi, oi, el) {
+  var card = document.getElementById('q' + qi);
+  card.querySelectorAll('.option').forEach(function(o) { o.classList.remove('selected'); });
+  el.classList.add('selected');
+  selections[qi] = oi;
+}
+
+function checkAll() {
+  var score = 0;
+  var unanswered = [];
+  questions.forEach(function(q, qi) {
+    if (selections[qi] === -1) unanswered.push(qi + 1);
+  });
+  if (unanswered.length > 0) {
+    alert('Erantzun galdera hauek / Contesta estas preguntas: ' + unanswered.join(', '));
+    return;
+  }
+  document.querySelectorAll('.option').forEach(function(o) { o.disabled = true; o.style.cursor = 'default'; });
+  document.getElementById('btn-check').style.display = 'none';
+
+  questions.forEach(function(q, qi) {
+    var card = document.getElementById('q' + qi);
+    var fb = document.getElementById('fb' + qi);
+    card.querySelectorAll('.option').forEach(function(o) {
+      var oi = parseInt(o.getAttribute('data-o'));
+      if (oi === q.correct) o.classList.add('correct');
+      if (oi === selections[qi] && oi !== q.correct) o.classList.add('wrong');
+    });
+    if (selections[qi] === q.correct) {
+      score++;
+      fb.className = 'feedback show-correct';
+      fb.textContent = '✅ Oso ondo!';
+    } else {
+      fb.className = 'feedback show-wrong';
+      fb.textContent = '❌ Gaizki. Erantzun zuzena: ' + q.opts[q.correct];
+    }
+  });
+
+  var res = showResultWithMedal(score, questions.length, 'result-card');
+  saveResult('Gizarte - Digestio Aparatua Quiz', score, questions.length, res.nota, res.pct);
+  document.getElementById('result-card').innerHTML += '<div style="margin-top:20px"><button class="btn-retry" onclick="location.reload()">\u{1F504} Berriro saiatu</button><a class="btn-portal" href="../portal.html">\u{1F3E0} Portalera itzuli</a></div>';
+  document.getElementById('result').style.display = 'block';
+  window.scrollTo({ top: document.getElementById('result').offsetTop - 20, behavior: 'smooth' });
+}
+
+renderAll();
+</script>
+</body>
+</html>

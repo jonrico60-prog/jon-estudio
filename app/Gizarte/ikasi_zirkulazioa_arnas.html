@@ -101,6 +101,7 @@
     <button class="tab" onclick="showSection('bihotza')">&#129728; Bihotza</button>
     <button class="tab" onclick="showSection('odola')">&#128684; Nola zirkulatzen du?</button>
     <button class="tab" onclick="showSection('arnasa')">&#127786; Arnas Aparatua</button>
+    <button class="tab" onclick="showSection('arnasketa')">&#128168; Nola hartzen dugu arnasa?</button>
     <button class="tab" onclick="showSection('flashcards')">&#127183; Flashcards</button>
   </div>
 
@@ -139,19 +140,23 @@
       <p>Bihotza organo <span class="highlight">hutsa</span> da barrutik. <strong>Lau barrunbe</strong> eta <strong>muskuluzko hormak</strong> ditu.</p>
       <p>Odola hodietan zehar <span class="highlight">bultzatzeaz</span> arduratzen da.</p>
 
-      <h3>&#128147; Bihotzaren mugimendua: Taupadak</h3>
-      <p>Bihotzak bi mugimendu egiten ditu:</p>
+      <h3>Bihotzaren atalak</h3>
       <div class="info-box">
-        <p>1. <strong>ZABALDU</strong> &#8594; Odola barrunbeetan sartzen da (odola jasotzen du)</p>
-        <p style="margin-top:8px">2. <strong>UZKURTU</strong> &#8594; Odola hodietara irteten da (odola kanpora bidaltzen du)</p>
+        <p><span class="diagram-label label-red">ARTERIAK</span> Bihotzetik irteten den odola eramaten dute.</p>
+        <p style="margin-top:8px"><span class="diagram-label label-blue">ZAINA</span> Bihotzera itzultzen den odola eramaten du.</p>
+        <p style="margin-top:8px"><span class="diagram-label label-green">BARRUNBEAK</span> Lau barrunbe daude bihotzaren barruan; haietan biltzen da odola.</p>
       </div>
 
-      <h3>Bihotzaren atalak</h3>
-      <p>
-        <span class="diagram-label label-red">Arteriak</span>
-        <span class="diagram-label label-blue">Zainak</span>
-        <span class="diagram-label label-green">Barrunbeak (4)</span>
-      </p>
+      <h3>&#128147; Bihotzaren mugimendua: Taupadak</h3>
+      <p>Bihotzak bi mugimendutan egiten ditu taupadak:</p>
+      <div class="info-box">
+        <p>1. <strong>ZABALDU</strong> &#8594; Bihotza zabaldu egiten da, eta odola barrunbeetan sartzen da (odola jasotzen du).</p>
+        <p style="margin-top:8px">2. <strong>UZKURTU</strong> &#8594; Bihotza uzkurtu egiten da, eta horrela odola hodietara (arterietara) irteten da.</p>
+      </div>
+
+      <div class="warning-box">
+        <strong>&#128161; Gogoratu:</strong> Bihotzak bi lan egiten ditu txandaka — <strong>ZABALDU</strong> (odola hartu) eta <strong>UZKURTU</strong> (odola bidali). Hori da taupada bakoitza.
+      </div>
     </div>
   </div>
 
@@ -223,6 +228,38 @@
     </div>
   </div>
 
+  <!-- NOLA HARTZEN DUGU ARNASA -->
+  <div id="arnasketa" class="section">
+    <div class="card">
+      <h2>&#128168; Nola hartzen dugu arnasa?</h2>
+      <p>Arnas aparatuaren funtzionamenduak <strong>hiru etapa</strong> ditu: <span class="highlight">arnasgora</span>, <span class="highlight">gas-trukea</span> eta <span class="highlight">arnasbehera</span>.</p>
+
+      <ol class="step-list">
+        <li>
+          <strong>Arnasgora</strong> (airea sartzen da)<br>
+          Arnasgora aireko airea birikietan satzea da. <span class="highlight">Diafragma</span> (arnas muskulua, birikien azpian dago) uzkurtzen da, birikien barrunbea zabaldu egiten da eta birikiak puztu egiten dira. Orduan, airea sartzen da.
+        </li>
+        <li>
+          <strong>Gas-trukea</strong> (oxigenoa eta CO2 trukatzen dira)<br>
+          Sartu den aireko <span class="highlight">oxigenoa</span> albeoloetan odolera igarotzen da. Aldi berean, <span class="highlight">karbono dioxidoa</span> odoletik albeoloen barruko airera igarotzen da.
+        </li>
+        <li>
+          <strong>Arnasbehera</strong> (airea irteten da)<br>
+          Arnas muskuluak <span class="highlight">erlaxatzen</span> direnean, birikiak hustu eta airea kanpora doa.
+        </li>
+      </ol>
+
+      <div class="info-box">
+        <p><strong>&#128161; Gogoratu:</strong></p>
+        <ul style="margin-top:6px">
+          <li><strong>Diafragma uzkurtzen da</strong> &#8594; airea sartu (arnasgora)</li>
+          <li><strong>Diafragma erlaxatzen da</strong> &#8594; airea irten (arnasbehera)</li>
+          <li><strong>Albeoloetan</strong> egiten da gas-trukea</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
   <!-- FLASHCARDS -->
   <div id="flashcards" class="section">
     <div class="card">
@@ -256,47 +293,4 @@
           <div class="front">Bihotzak zer bi mugimendu egiten ditu?</div>
           <div class="back">ZABALDU (odola sartzeko) eta UZKURTU (odola kanpora bidali).</div>
         </div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')">
-          <div class="front">Zer da arnas aparatua?</div>
-          <div class="back">Oxigenoa hartzen eta karbono dioxidoa kanporatzen duen gorputz atala.</div>
-        </div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')">
-          <div class="front">Zein dira arnasbideak (ordenan)?</div>
-          <div class="back">Sudurra/Ahoa &#8594; Faringea &#8594; Laringea &#8594; Trakea &#8594; Bronkioak &#8594; Albeoloak</div>
-        </div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')">
-          <div class="front">Zer dira BRONKIOAK?</div>
-          <div class="back">Trakea bi hoditan banatzen denean sortzen diren hodiak. Birikien barruan meheagotan banatzen dira.</div>
-        </div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')">
-          <div class="front">Zer dira ALBEOLOAK?</div>
-          <div class="back">Zaku ñimiñoak (oso txikiak) dira, odol-hodi mehez inguratuak. Bertan oxigenoa eta CO2 trukatzen dira.</div>
-        </div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')">
-          <div class="front">Zer dira BIRIKAK?</div>
-          <div class="back">Belaki (esponja) baten antzeko bi organo. Barruan bronkioen adarrak eta albeoloak dituzte.</div>
-        </div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')">
-          <div class="front">Odola nola itzultzen da bihotzera?</div>
-          <div class="back">Kapilarretatik lehenengo eta zainetatik gero.</div>
-        </div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')">
-          <div class="front">Zer gertatzen da birikietako albeoloetan?</div>
-          <div class="back">Oxigenoa hartu eta karbono dioxidoa askatzen da.</div>
-        </div>
-      </div>
-      <p class="flashcard-hint">&#128070; Klik egin txartel bakoitzean erantzuna ikusteko</p>
-    </div>
-  </div>
-</div>
-
-<script>
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
-  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-  document.getElementById(id).classList.add('active');
-  event.target.classList.add('active');
-}
-</script>
-</body>
-</html>
+        <div class=

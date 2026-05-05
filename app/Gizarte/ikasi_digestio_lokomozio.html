@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ikasi - Digestio eta Lokomozio Aparatua</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh; padding: 20px;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+  .header { text-align: center; color: white; padding: 20px 0; }
+  .header h1 { font-size: 1.8em; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+  .header p { opacity: 0.9; margin-top: 5px; }
+  .btn-back {
+    display: inline-flex; align-items: center; gap: 6px; color: white;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 0.95em;
+    font-family: inherit; transition: all 0.2s; margin-bottom: 18px; text-decoration: none;
+  }
+  .btn-back:hover { background: rgba(255,255,255,0.3); }
+  .tabs {
+    display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;
+  }
+  .tab {
+    padding: 10px 20px; border-radius: 10px; cursor: pointer; font-size: 1em;
+    font-family: inherit; border: 2px solid rgba(255,255,255,0.3); color: white;
+    background: rgba(255,255,255,0.1); transition: all 0.2s;
+  }
+  .tab:hover { background: rgba(255,255,255,0.2); }
+  .tab.active { background: white; color: #2c3e50; border-color: white; font-weight: bold; }
+  .card {
+    background: white; border-radius: 16px; padding: 28px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15); margin-bottom: 20px;
+  }
+  .card h2 { color: #8e44ad; font-size: 1.4em; margin-bottom: 15px; border-bottom: 3px solid #8e44ad; padding-bottom: 8px; }
+  .card h3 { color: #2c3e50; font-size: 1.15em; margin: 18px 0 8px; }
+  .card p, .card li { color: #555; line-height: 1.7; font-size: 1em; }
+  .card ul { padding-left: 20px; margin: 8px 0; }
+  .card li { margin-bottom: 6px; }
+  .highlight { background: #f0e6ff; padding: 2px 6px; border-radius: 4px; font-weight: 600; color: #6c3483; }
+  .info-box {
+    background: #eaf4fe; border-left: 4px solid #3498db; padding: 12px 16px;
+    border-radius: 0 8px 8px 0; margin: 12px 0;
+  }
+  .info-box strong { color: #2980b9; }
+  .warning-box {
+    background: #fef9e7; border-left: 4px solid #f39c12; padding: 12px 16px;
+    border-radius: 0 8px 8px 0; margin: 12px 0;
+  }
+  .section { display: none; }
+  .section.active { display: block; }
+  /* Flashcards */
+  .flashcard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 15px; }
+  .flashcard {
+    background: linear-gradient(135deg, #f5f0ff, #eee5ff); border-radius: 12px;
+    padding: 18px; cursor: pointer; transition: all 0.3s; min-height: 100px;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    border: 2px solid #d5c5f0; position: relative;
+  }
+  .flashcard:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
+  .flashcard.flipped { background: linear-gradient(135deg, #e8f8f5, #d5f5e3); border-color: #82e0aa; }
+  .flashcard .front { font-weight: bold; color: #6c3483; font-size: 1.05em; }
+  .flashcard .back { display: none; color: #1e8449; font-size: 0.95em; line-height: 1.5; }
+  .flashcard.flipped .front { display: none; }
+  .flashcard.flipped .back { display: block; }
+  .flashcard-hint { font-size: 0.8em; color: #aaa; text-align: center; margin-top: 10px; }
+  .diagram-label {
+    display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85em;
+    font-weight: 600; margin: 3px;
+  }
+  .label-red { background: #fadbd8; color: #c0392b; }
+  .label-blue { background: #d6eaf8; color: #2471a3; }
+  .label-green { background: #d5f5e3; color: #1e8449; }
+  .label-purple { background: #e8daef; color: #6c3483; }
+  .label-orange { background: #fdebd0; color: #b9770e; }
+  .step-list { counter-reset: steps; list-style: none; padding: 0; }
+  .step-list li {
+    counter-increment: steps; padding: 12px 15px 12px 55px; position: relative;
+    margin-bottom: 10px; background: #fafafa; border-radius: 10px; border-left: 3px solid #8e44ad;
+  }
+  .step-list li::before {
+    content: counter(steps); position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    width: 30px; height: 30px; background: #8e44ad; color: white; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9em;
+  }
+  .bone-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .bone-table th, .bone-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #eee; }
+  .bone-table th { background: #f0e6ff; color: #6c3483; font-weight: 600; }
+  .bone-table tr:hover { background: #f9f5ff; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="btn-back" href="../portal.html">&#8592; Atzera / Volver</a>
+  <div class="header">
+    <h1>&#127891; Digestio eta Lokomozio Aparatua</h1>
+    <p>Ikasi - Apuntes y resumen interactivo</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showSection('digestio')">&#127869;&#65039; Digestio Aparatua</button>
+    <button class="tab" onclick="showSection('digestio-fases')">&#128293; 3 Faseak</button>
+    <button class="tab" onclick="showSection('lokomozio')">&#129460; Lokomozio Aparatua</button>
+    <button class="tab" onclick="showSection('hezurrak')">&#129460; Hezurrak</button>
+    <button class="tab" onclick="showSection('flashcards')">&#127183; Flashcards</button>
+  </div>
+
+  <!-- DIGESTIO APARATUA -->
+  <div id="digestio" class="section active">
+    <div class="card">
+      <h2>&#127869;&#65039; Digestio Aparatua</h2>
+      <p>Digestio aparatuak <span class="highlight">janaria gure gorputzean prozesatzen du</span>, gorputzak behar dituen mantenugaiak hartzeko.</p>
+
+      <h3>&#10068; Zer da digestioa?</h3>
+      <div class="info-box">
+        <p>Janariak gure gorputzean egiten duen <strong>bidaia</strong> da. Janaria ahotik sartzen dugunean hasten da:</p>
+        <ul style="margin-top:8px">
+          <li>Janaria <strong>ahoan txikitu eta irentsi</strong> egiten da.</li>
+          <li>Gero <strong>urdailera</strong> ailegatzen denean gehiago txikituko da.</li>
+          <li>Gorputzak behar ez duena <strong>hesteetatik pasatuko da</strong>, eta kaka bihurtuta uzkitik kanporatuko dugu.</li>
+        </ul>
+      </div>
+
+      <h3>&#10068; Zertarako da?</h3>
+      <div class="info-box">
+        <p><strong>Energia eskuratzeko</strong>, gorputza hazteko, mugitzeko eta berotzeko.</p>
+      </div>
+
+      <h3>Digestio aparatuaren atalak (ordenan)</h3>
+      <p style="text-align:center; font-size:1.05em; margin-top:10px; line-height:2.2">
+        <span class="diagram-label label-red">Ahoa</span>
+        &#8594;
+        <span class="diagram-label label-orange">Hestegorria</span>
+        &#8594;
+        <span class="diagram-label label-purple">Urdaila</span>
+        &#8594;
+        <span class="diagram-label label-green">Heste meharra</span>
+        &#8594;
+        <span class="diagram-label label-blue">Heste lodia</span>
+        &#8594;
+        <span class="diagram-label label-red">Uzkia</span>
+      </p>
+
+      <div class="warning-box">
+        <strong>&#128218; Hiztegia:</strong>
+        <ul style="margin-top:6px">
+          <li><strong>Hestegorria:</strong> ahotik urdailera doan hodia</li>
+          <li><strong>Urdaila:</strong> janaria gehiago txikitzen den lekua</li>
+          <li><strong>Heste meharra:</strong> mantenugaiak xurgatzen dira</li>
+          <li><strong>Heste lodia:</strong> ura eta gatz mineralak xurgatzen dira</li>
+          <li><strong>Uzkia:</strong> kaka kanporatzen den lekua</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIGESTIO FASEAK -->
+  <div id="digestio-fases" class="section">
+    <div class="card">
+      <h2>&#128293; Digestioaren 3 faseak</h2>
+      <p>Digestioak <strong>hiru fase</strong> ditu: Aho fasea, Urdail fasea eta Heste fasea.</p>
+
+      <ol class="step-list">
+        <li>
+          <strong>Aho fasea</strong><br>
+          Ahoan <span class="highlight">prozesu mekanikoa</span> (hortzekin txikitzea) eta <span class="highlight">prozesu kimikoa</span> (listuarekin nahastea) gertatzen dira.
+        </li>
+        <li>
+          <strong>Urdail fasea</strong><br>
+          Elikadura boloa faringetik hestegorrira eta ondoren <span class="highlight">urdailera</span> doa. Prozesu honetan elikagaietako <strong>proteinak eta karbohidratoak</strong> desegiten dira eta <strong>ore</strong> bihurtzen dira.
+        </li>
+        <li>
+          <strong>Heste fasea</strong><br>
+          Dena digeritu ondoren, <span class="highlight">heste meharreko</span> odol-hodiek <strong>mantenugaiak xurgatzen</strong> dituzte. Ondoren, <span class="highlight">heste lodira</span> heltzean <strong>ura eta gatz mineralak</strong> xurgatzen dira. Azkenik, hondakinak <strong>uzkitik</strong> kanporatzen dira.
+        </li>
+      </ol>
+
+      <div class="info-box">
+        <p><strong>&#128161; Gogoratu:</strong></p>
+        <ul style="margin-top:6px">
+          <li><strong>Heste MEHARREAN</strong> &#8594; mantenugaiak xurgatu</li>
+          <li><strong>Heste LODIAN</strong> &#8594; ura eta gatz mineralak xurgatu</li>
+          <li><strong>UZKIA</strong> &#8594; hondakinak kanporatu</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOKOMOZIO APARATUA -->
+  <div id="lokomozio" class="section">
+    <div class="card">
+      <h2>&#129460; Lokomozio Aparatua</h2>
+      <p>Lokomozio-aparatua giza gorputzaren <span class="highlight">mugimenduak ahalbidetzen</span> dituen aparatua da.</p>
+
+      <h3>&#10068; Zertarako da?</h3>
+      <div class="info-box">
+        <p><strong>Mugimendua ahalbidetzeko.</strong></p>
+      </div>
+
+      <h3>&#10068; Zerk osatzen du?</h3>
+      <p>Hiru atalek osatzen dute:</p>
+      <ul>
+        <li><span class="diagram-label label-purple">HEZURRAK</span></li>
+        <li><span class="diagram-label label-red">GIHARRAK</span></li>
+        <li><span class="diagram-label label-blue">GILTZADURAK</span> (artikulazioak)</li>
+      </ul>
+
+      <h3>&#129460; Hezurrak</h3>
+      <div class="info-box">
+        <p>Hezurrak <strong>organo zurrun eta gogorrak</strong> dira eta <strong>giltzaduren bidez</strong> elkarri lotuta daude.</p>
+      </div>
+
+      <h3>&#128170; Giharrak</h3>
+      <div class="info-box">
+        <p>Giharrak <strong>organo elastikoak</strong> dira; hau da, <strong>luzatu eta uzkurtu</strong> daitezke hautsi gabe. <strong>Tendoien bidez</strong> daude hezurrei lotuak.</p>
+      </div>
+
+      <h3>&#128279; Giltzadurak</h3>
+      <div class="info-box">
+        <p>Giltzadurak (artikulazioak) hezurren arteko <strong>lotuneak</strong> dira. Mugimendua ahalbidetzen dute (belauna, ukondoa, sorbalda...).</p>
+      </div>
+
+      <div class="warning-box">
+        <strong>&#128161; Gogoratu:</strong>
+        <ul style="margin-top:6px">
+          <li><strong>Hezurrak</strong> = zurrun eta gogor</li>
+          <li><strong>Giharrak</strong> = elastiko (luzatu/uzkurtu)</li>
+          <li><strong>Giltzadurak</strong> = hezurren arteko lotuneak</li>
+          <li><strong>Tendoiak</strong> = giharrak hezurrei lotzen dituzte</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEZURRAK -->
+  <div id="hezurrak" class="section">
+    <div class="card">
+      <h2>&#129460; Gorputzeko hezur nagusiak</h2>
+      <p>Hauek dira ikasi behar dituzun gorputzeko hezur nagusiak:</p>
+
+      <table class="bone-table">
+        <thead>
+          <tr><th>Hezurra</th><th>Non dago?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Garezurra</strong></td><td>Buruan</td></tr>
+          <tr><td><strong>Kutxa torazikoa</strong></td><td>Bularraldean (saihets-hezurrak)</td></tr>
+          <tr><td><strong>Bizkarrezurra</strong></td><td>Bizkarrean (zutabea)</td></tr>
+          <tr><td><strong>Humero</strong></td><td>Beso-besagaina (sorbaldatik ukondora)</td></tr>
+          <tr><td><strong>Erradio</strong></td><td>Beso-behealdean (ukondotik eskumuturreraino)</td></tr>
+          <tr><td><strong>Pelbisa</strong></td><td>Aldakan</td></tr>
+          <tr><td><strong>Femurra</strong></td><td>Izterrean (aldakatik belaunera)</td></tr>
+          <tr><td><strong>Tibia</strong></td><td>Belaun-azpiko hezur lodia</td></tr>
+          <tr><td><strong>Peronea</strong></td><td>Belaun-azpiko hezur mehea</td></tr>
+        </tbody>
+      </table>
+
+      <div class="info-box" style="margin-top:18px">
+        <p><strong>&#128161; Trukoa:</strong> Hezurrek <strong>gainetik beherako</strong> ordena erraz ikasten da:</p>
+        <p style="margin-top:6px; text-align:center; font-size:1.05em; line-height:2">
+          <span class="diagram-label label-purple">Garezur</span>
+          &#8594;
+          <span class="diagram-label label-blue">Kutxa toraziko / Bizkarrezur</span>
+          &#8594;
+          <span class="diagram-label label-red">Humero</span>
+          &#8594;
+          <span class="diagram-label label-orange">Erradio</span>
+          <br>
+          <span class="diagram-label label-green">Pelbis</span>
+          &#8594;
+          <span class="diagram-label label-purple">Femur</span>
+          &#8594;
+          <span class="diagram-label label-blue">Tibia / Perone</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div id="flashcards" class="section">
+    <div class="card">
+      <h2>&#127183; Flashcards - Klik egin irabiatzeko!</h2>
+      <div class="flashcard-grid">
+        <!-- DIGESTIO -->
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer da digestioa?</div>
+          <div class="back">Janariak gure gorputzean egiten duen bidaia. Ahotik hasten da eta uzkitik bukatzen.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zertarako da digestioa?</div>
+          <div class="back">Energia eskuratzeko, gorputza hazteko, mugitzeko eta berotzeko.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zenbat fase ditu digestioak?</div>
+          <div class="back">Hiru: Aho fasea, Urdail fasea eta Heste fasea.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer hodi pasatzen da ahotik urdailera?</div>
+          <div class="back">Hestegorria.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Non xurgatzen dira mantenugaiak?</div>
+          <div class="back">Heste meharrean.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Non xurgatzen dira ura eta gatz mineralak?</div>
+          <div class="back">Heste lodian.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Aho fasean zer prozesu gertatzen dira?</div>
+          <div class="back">Prozesu mekanikoa (hortzekin txikitzea) eta prozesu kimikoa (listuarekin).</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Urdail fasean zer desegiten da?</div>
+          <div class="back">Proteinak eta karbohidratoak; ore bihurtzen da.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Nondik kanporatzen dira hondakinak?</div>
+          <div class="back">Uzkitik (kaka).</div>
+        </div>
+        <!-- LOKOMOZIO -->
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zertarako da lokomozio aparatua?</div>
+          <div class="back">Mugimendua ahalbidetzeko.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zerk osatzen du lokomozio aparatua?</div>
+          <div class="back">Hezurrek, giharrek eta giltzadurek (artikulazioek).</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer dira hezurrak?</div>
+          <div class="back">Organo zurrun eta gogorrak; giltzaduren bidez elkarri lotuta daude.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer dira giharrak?</div>
+          <div class="back">Organo elastikoak; luzatu eta uzkurtu daitezke. Tendoien bidez hezurrei lotuta daude.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zerk lotzen ditu giharrak hezurrei?</div>
+          <div class="back">Tendoiek.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Buruko hezurra...</div>
+          <div class="back">Garezurra.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Bularraldeko hezurra (saihets-hezurrak)...</div>
+          <div class="back">Kutxa torazikoa.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Bizkarreko zutabe-hezurra...</div>
+          <div class="back">Bizkarrezurra.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Sorbaldatik ukondora dagoen hezurra...</div>
+          <div class="back">Humeroa.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Beso-behealdeko hezurra...</div>
+          <div class="back">Erradioa.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Aldakako hezurra...</div>
+          <div class="back">Pelbisa.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Izterreko hezur luzea...</div>
+          <div class="back">Femurra.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Belaun-azpiko hezur lodia...</div>
+          <div class="back">Tibia.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Belaun-azpiko hezur mehea...</div>
+          <div class="back">Peronea.</div>
+        </div>
+      </div>
+      <p class="flashcard-hint">&#128070; Klik egin txartel bakoitzean erantzuna ikusteko</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
