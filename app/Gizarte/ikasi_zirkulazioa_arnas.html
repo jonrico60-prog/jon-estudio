@@ -293,4 +293,67 @@
           <div class="front">Bihotzak zer bi mugimendu egiten ditu?</div>
           <div class="back">ZABALDU (odola sartzeko) eta UZKURTU (odola kanpora bidali).</div>
         </div>
-        <div class=
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer da arnas aparatua?</div>
+          <div class="back">Oxigenoa hartzen eta karbono dioxidoa kanporatzen duen gorputz atala.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zein dira arnasbideak (ordenan)?</div>
+          <div class="back">Sudurra/Ahoa &#8594; Faringea &#8594; Laringea &#8594; Trakea &#8594; Bronkioak &#8594; Albeoloak</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer dira BRONKIOAK?</div>
+          <div class="back">Trakea bi hoditan banatzen denean sortzen diren hodiak. Birikien barruan meheagotan banatzen dira.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer dira ALBEOLOAK?</div>
+          <div class="back">Zaku ñimiñoak (oso txikiak) dira, odol-hodi mehez inguratuak. Bertan oxigenoa eta CO2 trukatzen dira.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer dira BIRIKAK?</div>
+          <div class="back">Belaki (esponja) baten antzeko bi organo. Barruan bronkioen adarrak eta albeoloak dituzte.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Odola nola itzultzen da bihotzera?</div>
+          <div class="back">Kapilarretatik lehenengo eta zainetatik gero.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer gertatzen da birikietako albeoloetan?</div>
+          <div class="back">Oxigenoa hartu eta karbono dioxidoa askatzen da.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer da arnasgora?</div>
+          <div class="back">Aireko airea birikietan satzea da. Diafragma uzkurtu eta birikiak puztu egiten dira.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer da gas-trukea?</div>
+          <div class="back">Albeoloetan: oxigenoa odolera igarotzen da eta karbono dioxidoa albeoloetara.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer da arnasbehera?</div>
+          <div class="back">Arnas muskuluak erlaxatzen dira, birikiak hustu eta airea kanpora doa.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zer da diafragma?</div>
+          <div class="back">Birikien azpian dagoen arnas muskulua. Uzkurtzen denean, airea sartzen da.</div>
+        </div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="front">Zenbat etapa ditu arnas funtzionamenduak?</div>
+          <div class="back">Hiru: arnasgora, gas-trukea eta arnasbehera.</div>
+        </div>
+      </div>
+      <p class="flashcard-hint">&#128070; Klik egin txartel bakoitzean erantzuna ikusteko</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
